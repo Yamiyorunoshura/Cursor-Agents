@@ -282,26 +282,31 @@ show_usage() {
     echo ""
 }
 
-# 檢查是否已安裝
+# 檢查是否已安裝並移除舊版本
 check_existing_installation() {
     if [ -d "${RULES_DIR}" ] && [ "$(ls -A ${RULES_DIR} 2>/dev/null)" ]; then
         log_warning "檢測到已存在的安裝"
+        log_info "正在移除舊版本..."
         
-        # 嘗試從 /dev/tty 讀取以支援 pipe 模式
-        if [ -t 0 ] || [ -r /dev/tty ]; then
-            if [ ! -t 0 ] && [ -r /dev/tty ]; then
-                read -p "是否覆蓋現有安裝？(y/N) " -n 1 -r < /dev/tty
-            else
-                read -p "是否覆蓋現有安裝？(y/N) " -n 1 -r
-            fi
-            echo
-            if [[ ! $REPLY =~ ^[Yy]$ ]]; then
-                log_info "安裝已取消"
-                exit 0
-            fi
-        else
-            log_warning "無法互動確認，將覆蓋現有安裝"
+        # 移除舊的規則文件
+        if [ -d "${RULES_DIR}" ]; then
+            rm -rf "${RULES_DIR}"
+            log_success "已移除舊的規則文件"
         fi
+        
+        # 移除舊的命令文件
+        if [ -d "${COMMANDS_DIR}" ]; then
+            rm -rf "${COMMANDS_DIR}"
+            log_success "已移除舊的命令文件"
+        fi
+        
+        # 移除舊的版本鎖定文件
+        if [ -f "${CURSOR_DIR}/cursor-agents.lock" ]; then
+            rm -f "${CURSOR_DIR}/cursor-agents.lock"
+            log_success "已移除舊的版本鎖定文件"
+        fi
+        
+        log_success "舊版本已完全移除"
     fi
 }
 
