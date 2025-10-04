@@ -7,19 +7,18 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.2.0] - 2025-10-04
+
 ### Added
-- 支援多種安裝模式（全域/專案/自訂路徑）
-- 互動式路徑選擇功能
-- 支援通過環境變數 `INSTALL_MODE` 和 `INSTALL_PATH` 指定安裝方式
-- 支援命令行參數指定安裝模式
-- 安裝模式對比表格說明
+- 新增 Initer Agent 規則（專案初始化管理）
+- 新增 `sunnycore_initer` 命令文件
 
 ### Changed
-- 改進安裝腳本，支援 `curl | bash` 時通過環境變數控制安裝行為
-- 更新 README.md，詳細說明四種安裝方式
+- 改進 install.sh 安裝流程，移除互動式確認，改為自動移除舊版本
+- 優化安裝體驗，減少用戶手動操作步驟
 
-### Fixed
-- 修復通過 pipe 執行時無法互動的問題（使用 /dev/tty）
+### Features
+- **Initer**: 自動化專案初始化、文檔模板生成、GitHub 倉庫創建、License 選擇
 
 ## [0.1.0] - 2025-10-04
 
