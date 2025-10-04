@@ -95,28 +95,24 @@ determine_install_path() {
     fi
     
     # 優先級 3: 檢查環境變數 INSTALL_MODE
-    if [ -z "$INSTALL_MODE" ] && [ -n "$INSTALL_MODE_ENV" ]; then
-        INSTALL_MODE="$INSTALL_MODE_ENV"
+    if [ -z "$INSTALL_MODE" ] && [ -n "$INSTALL_MODE" ]; then
+        # 這裡不需要做任何事，因為 INSTALL_MODE 已經設定了
+        :
     fi
     
-    # 優先級 4: 互動式選擇（只有在可以讀取 /dev/tty 時才能互動）
+    # 優先級 4: 互動式選擇
     if [ -z "$INSTALL_MODE" ] && [ -z "$CURSOR_DIR" ]; then
         # 檢查是否可以互動（不是通過 pipe 執行）
-        if [ -t 0 ] || [ -r /dev/tty ]; then
+        if [ -t 0 ]; then
             echo ""
             log_info "請選擇安裝模式："
             echo "  1) 全域安裝（安裝到 ~/.cursor/，對所有專案生效）"
             echo "  2) 專案安裝（安裝到當前目錄 ./.cursor/，只對當前專案生效）"
             echo "  3) 自訂路徑"
             echo ""
-            
-            # 如果通過 pipe，嘗試從 /dev/tty 讀取
-            if [ ! -t 0 ] && [ -r /dev/tty ]; then
-                read -p "請輸入選項 [1-3] (預設: 1): " choice < /dev/tty
-            else
-                read -p "請輸入選項 [1-3] (預設: 1): " choice
-            fi
-            
+
+            read -p "請輸入選項 [1-3] (預設: 1): " choice
+
             case "${choice:-1}" in
                 1)
                     INSTALL_MODE="global"
@@ -125,11 +121,7 @@ determine_install_path() {
                     INSTALL_MODE="project"
                     ;;
                 3)
-                    if [ ! -t 0 ] && [ -r /dev/tty ]; then
-                        read -p "請輸入安裝路徑: " CURSOR_DIR < /dev/tty
-                    else
-                        read -p "請輸入安裝路徑: " CURSOR_DIR
-                    fi
+                    read -p "請輸入安裝路徑: " CURSOR_DIR
                     INSTALL_MODE="custom"
                     ;;
                 *)
