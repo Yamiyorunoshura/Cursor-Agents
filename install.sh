@@ -34,7 +34,6 @@ API_URL="https://api.github.com/repos/Yamiyorunoshura/Cursor-Agents/contents"
 
 # 安裝路徑變數
 CURSOR_DIR=""
-RULES_DIR=""
 COMMANDS_DIR=""
 INSTALL_MODE=""
 
@@ -212,13 +211,11 @@ determine_install_path() {
             ;;
     esac
     
-    RULES_DIR="${CURSOR_DIR}/rules"
     COMMANDS_DIR="${CURSOR_DIR}/commands"
     
     echo ""
     log_success "安裝路徑已確定："
     echo "  - 主目錄: ${CURSOR_DIR}"
-    echo "  - 規則文件: ${RULES_DIR}"
     echo "  - 命令文件: ${COMMANDS_DIR}"
     echo ""
 }
@@ -227,7 +224,6 @@ determine_install_path() {
 create_directories() {
     log_info "創建目錄結構..."
     
-    mkdir -p "${RULES_DIR}"
     mkdir -p "${COMMANDS_DIR}"
     
     log_success "目錄結構創建完成"
@@ -346,13 +342,6 @@ except Exception as e:
     return 0
 }
 
-# 下載所有規則文件
-download_rules() {
-    log_info "下載 AI Agent 規則文件..."
-    download_directory "rules" "${RULES_DIR}" || exit 1
-    log_success "規則文件下載完成"
-}
-
 # 下載所有命令文件
 download_commands() {
     log_info "下載命令文件..."
@@ -377,31 +366,24 @@ show_usage() {
     log_success "=========================================="
     echo ""
     log_info "安裝位置："
-    echo "  - 規則文件: ${RULES_DIR}"
     echo "  - 命令文件: ${COMMANDS_DIR}"
     echo ""
     
     if [ "$INSTALL_MODE" = "project" ]; then
-        log_warning "您使用了專案安裝模式，Agent 規則只會在當前專案中生效"
+        log_warning "您使用了專案安裝模式，Agent 命令只會在當前專案中生效"
         log_info "如需在其他專案中使用，請重新執行安裝腳本"
         echo ""
     elif [ "$INSTALL_MODE" = "global" ]; then
-        log_info "您使用了全域安裝模式，Agent 規則將對所有 Cursor 專案生效"
+        log_info "您使用了全域安裝模式，Agent 命令將對所有 Cursor 專案生效"
         echo ""
     fi
 }
 
 # 檢查是否已安裝並移除舊版本
 check_existing_installation() {
-    if [ -d "${RULES_DIR}" ] && [ "$(ls -A ${RULES_DIR} 2>/dev/null)" ]; then
+    if [ -d "${COMMANDS_DIR}" ] && [ "$(ls -A ${COMMANDS_DIR} 2>/dev/null)" ]; then
         log_warning "檢測到已存在的安裝"
         log_info "正在移除舊版本..."
-        
-        # 移除舊的規則文件
-        if [ -d "${RULES_DIR}" ]; then
-            rm -rf "${RULES_DIR}"
-            log_success "已移除舊的規則文件"
-        fi
         
         # 移除舊的命令文件
         if [ -d "${COMMANDS_DIR}" ]; then
@@ -431,7 +413,6 @@ main() {
     determine_install_path "$@"
     check_existing_installation
     create_directories
-    download_rules
     download_commands
     download_lock_file
     show_usage

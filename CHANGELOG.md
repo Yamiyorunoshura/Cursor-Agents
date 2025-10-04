@@ -7,6 +7,16 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.3.0] - 2025-10-04
+
+### Changed
+- 重構命令文件架構：將規則內容直接整合到命令文件中，不再依賴外部 rules 目錄
+- 簡化使用方式：用戶現在只需引用 commands 文件即可使用 Agent，無需分別管理 commands 和 rules
+- 簡化安裝流程：移除 rules 目錄的下載與安裝邏輯
+
+### Removed
+- 刪除 `rules/` 目錄及其下所有 .mdc 規則文件（已整合至 commands 文件）
+
 ## [0.2.3] - 2025-10-04
 
 ### Added

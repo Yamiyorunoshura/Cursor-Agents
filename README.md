@@ -94,19 +94,16 @@ curl -fsSL https://raw.githubusercontent.com/Yamiyorunoshura/Cursor-Agents/main/
 
 ```
 cursor-agents/
-├── commands/                    # 快速調用指令
+├── commands/                    # AI Agent 命令文件（包含完整規則）
 │   ├── sunnycore_commiter.md
 │   ├── sunnycore_initer.md
 │   ├── sunnycore_prompt-optimiser.md
 │   └── sunnycore_prompt-reviewer.md
-├── rules/                       # AI Agent 完整規則定義
-│   ├── sunnycore_commiter.mdc
-│   ├── sunnycore_initer.mdc
-│   ├── sunnycore_prompt-optimiser.mdc
-│   └── sunnycore_prompt-reviewer.mdc
 ├── cursor-agents.lock           # 版本鎖定文件
+├── install.sh                   # 安裝腳本
 ├── .gitignore
 ├── CHANGELOG.md
+├── LICENSE
 └── README.md
 ```
 
