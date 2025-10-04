@@ -94,16 +94,12 @@ determine_install_path() {
         INSTALL_MODE="custom"
     fi
     
-    # 優先級 3: 檢查環境變數 INSTALL_MODE
-    if [ -z "$INSTALL_MODE" ] && [ -n "$INSTALL_MODE" ]; then
-        # 這裡不需要做任何事，因為 INSTALL_MODE 已經設定了
-        :
-    fi
-    
+      
     # 優先級 4: 互動式選擇
     if [ -z "$INSTALL_MODE" ] && [ -z "$CURSOR_DIR" ]; then
-        # 檢查是否可以互動（不是通過 pipe 執行）
+        # 檢查是否可以互動
         if [ -t 0 ]; then
+            # 直接在終端中執行
             echo ""
             log_info "請選擇安裝模式："
             echo "  1) 全域安裝（安裝到 ~/.cursor/，對所有專案生效）"
@@ -129,8 +125,44 @@ determine_install_path() {
                     INSTALL_MODE="global"
                     ;;
             esac
+        elif [ -r /dev/tty ]; then
+            # 通過 pipe 執行，但可以訪問 tty（如 curl | bash）
+            echo ""
+            log_info "請選擇安裝模式："
+            echo "  1) 全域安裝（安裝到 ~/.cursor/，對所有專案生效）"
+            echo "  2) 專案安裝（安裝到當前目錄 ./.cursor/，只對當前專案生效）"
+            echo "  3) 自訂路徑"
+            echo ""
+
+            # 嘗試從 /dev/tty 讀取用戶輸入
+            if read choice < /dev/tty 2>/dev/null; then
+                case "${choice:-1}" in
+                    1)
+                        INSTALL_MODE="global"
+                        ;;
+                    2)
+                        INSTALL_MODE="project"
+                        ;;
+                    3)
+                        if read -p "請輸入安裝路徑: " CURSOR_DIR < /dev/tty 2>/dev/null; then
+                            INSTALL_MODE="custom"
+                        else
+                            log_warning "無法讀取路徑，使用全域安裝"
+                            INSTALL_MODE="global"
+                        fi
+                        ;;
+                    *)
+                        log_warning "無效選項，使用預設值（全域安裝）"
+                        INSTALL_MODE="global"
+                        ;;
+                esac
+            else
+                log_warning "無法讀取用戶輸入，使用預設值（全域安裝）"
+                INSTALL_MODE="global"
+            fi
         else
-            # 無法互動時使用預設值
+            # 完全無法互動時使用預設值
+            log_info "無法進行互動式選擇，使用預設值（全域安裝）"
             INSTALL_MODE="global"
         fi
     fi
