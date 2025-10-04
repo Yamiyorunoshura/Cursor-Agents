@@ -38,54 +38,18 @@
 
 ### 安裝
 
-Cursor AI Agents 支援多種安裝模式：
-
-| 安裝模式 | 安裝路徑 | 適用場景 |
-|---------|---------|---------|
-| **全域安裝** | `~/.cursor/` | 所有 Cursor 專案共用（推薦） |
-| **專案安裝** | `./.cursor/` | 只對當前專案生效（團隊協作） |
-| **自訂路徑** | 自訂 | 特殊需求 |
-
-#### 方式一：全域安裝（推薦）
-
-安裝到 `~/.cursor/`，對所有 Cursor 專案生效：
+使用以下命令一鍵安裝，腳本會自動提供互動式選單讓你選擇安裝模式：
 
 ```bash
 curl -fsSL https://raw.githubusercontent.com/Yamiyorunoshura/Cursor-Agents/main/install.sh | bash
 ```
 
-#### 方式二：專案安裝
+安裝模式說明：
+- **全域安裝**（推薦）：安裝到 `~/.cursor/`，對所有 Cursor 專案生效
+- **專案安裝**：安裝到當前專案的 `.cursor/`，只對當前專案生效（適合團隊協作）
+- **自訂路徑**：安裝到指定路徑（適合特殊需求）
 
-安裝到當前專案的 `.cursor/`，只對當前專案生效：
-
-```bash
-curl -fsSL https://raw.githubusercontent.com/Yamiyorunoshura/Cursor-Agents/main/install.sh | INSTALL_MODE=project bash
-```
-
-#### 方式三：自訂路徑安裝
-
-安裝到指定路徑：
-
-```bash
-curl -fsSL https://raw.githubusercontent.com/Yamiyorunoshura/Cursor-Agents/main/install.sh | INSTALL_PATH=/your/custom/path bash
-```
-
-#### 方式四：互動式安裝
-
-下載腳本後執行，可以通過選單選擇安裝模式：
-
-```bash
-curl -fsSL https://raw.githubusercontent.com/Yamiyorunoshura/Cursor-Agents/main/install.sh -o install.sh
-bash install.sh
-```
-
-或從源碼安裝：
-
-```bash
-git clone https://github.com/Yamiyorunoshura/Cursor-Agents.git
-cd Cursor-Agents
-./install.sh
-```
+> 💡 提示：安裝腳本支援完整的互動式體驗，會引導你完成所有設定。
 
 ### 使用方法
 

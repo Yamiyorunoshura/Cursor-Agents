@@ -264,22 +264,6 @@ show_usage() {
         log_info "您使用了全域安裝模式，Agent 規則將對所有 Cursor 專案生效"
         echo ""
     fi
-    
-    log_info "使用方法："
-    echo "  在 Cursor IDE 中，將以下文件拖入對話框以啟用對應的 Agent："
-    echo ""
-    echo "  1. 審查提示詞："
-    echo "     @commands/sunnycore_prompt-reviewer.md"
-    echo ""
-    echo "  2. 優化提示詞："
-    echo "     @commands/sunnycore_prompt-optimiser.md"
-    echo ""
-    echo "  3. 提交變更："
-    echo "     @commands/sunnycore_commiter.md"
-    echo ""
-    log_info "更多資訊請訪問："
-    echo "  ${REPO_URL}"
-    echo ""
 }
 
 # 檢查是否已安裝並移除舊版本
