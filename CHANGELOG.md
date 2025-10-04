@@ -7,7 +7,15 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.2.1] - 2025-10-04
+
+### Added
+- 新增 GitHub API 整合，動態獲取目錄內容
+- 新增 `download_directory` 函數實現自動化目錄下載
+
 ### Changed
+- 重構 install.sh 下載邏輯，從固定文件列表改為動態獲取
+- 改進 `download_rules` 和 `download_commands` 函數，使用新的動態下載機制
 - 簡化 README.md 安裝說明，強調安裝腳本的互動式體驗
 - 移除 install.sh 安裝完成後的使用指南輸出，減少冗餘資訊
 

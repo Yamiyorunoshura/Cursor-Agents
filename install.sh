@@ -30,6 +30,7 @@ NC='\033[0m' # No Color
 # 遠端倉庫 URL
 REPO_URL="https://github.com/Yamiyorunoshura/Cursor-Agents"
 RAW_URL="${REPO_URL}/raw/main"
+API_URL="https://api.github.com/repos/Yamiyorunoshura/Cursor-Agents/contents"
 
 # 安裝路徑變數
 CURSOR_DIR=""
@@ -184,7 +185,7 @@ create_directories() {
     log_success "目錄結構創建完成"
 }
 
-# 下載文件
+# 下載單個文件
 download_file() {
     local url=$1
     local dest=$2
@@ -201,37 +202,57 @@ download_file() {
     fi
 }
 
+# 下載整個目錄的所有文件
+download_directory() {
+    local dir_name=$1
+    local dest_dir=$2
+    
+    log_info "獲取 ${dir_name} 目錄內容..."
+    
+    # 使用 GitHub API 獲取目錄內容
+    local api_response=$(curl -fsSL "${API_URL}/${dir_name}?ref=main")
+    
+    if [ $? -ne 0 ]; then
+        log_error "無法獲取 ${dir_name} 目錄內容"
+        return 1
+    fi
+    
+    # 解析 JSON 獲取所有文件的下載 URL
+    # 使用 grep 和 sed 提取 download_url 和 name
+    local file_count=0
+    
+    echo "${api_response}" | grep -o '"download_url":"[^"]*"' | while IFS=':' read -r key url; do
+        # 移除引號
+        url=$(echo "$url" | sed 's/"//g')
+        
+        # 獲取文件名
+        local filename=$(basename "$url")
+        
+        # 跳過空 URL
+        if [ -z "$url" ] || [ "$url" = "null" ]; then
+            continue
+        fi
+        
+        # 下載文件
+        download_file "$url" "${dest_dir}/${filename}" || return 1
+        file_count=$((file_count + 1))
+    done
+    
+    log_success "${dir_name} 目錄下載完成"
+    return 0
+}
+
 # 下載所有規則文件
 download_rules() {
     log_info "下載 AI Agent 規則文件..."
-    
-    local rules=(
-        "sunnycore_commiter.mdc"
-        "sunnycore_prompt-optimiser.mdc"
-        "sunnycore_prompt-reviewer.mdc"
-    )
-    
-    for rule in "${rules[@]}"; do
-        download_file "${RAW_URL}/rules/${rule}" "${RULES_DIR}/${rule}" || exit 1
-    done
-    
+    download_directory "rules" "${RULES_DIR}" || exit 1
     log_success "規則文件下載完成"
 }
 
 # 下載所有命令文件
 download_commands() {
     log_info "下載命令文件..."
-    
-    local commands=(
-        "sunnycore_commiter.md"
-        "sunnycore_prompt-optimiser.md"
-        "sunnycore_prompt-reviewer.md"
-    )
-    
-    for cmd in "${commands[@]}"; do
-        download_file "${RAW_URL}/commands/${cmd}" "${COMMANDS_DIR}/${cmd}" || exit 1
-    done
-    
+    download_directory "commands" "${COMMANDS_DIR}" || exit 1
     log_success "命令文件下載完成"
 }
 
