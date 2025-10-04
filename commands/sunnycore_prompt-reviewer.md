@@ -1,5 +1,6 @@
 [輸入]
   1. 用戶附加的提示詞
+  2. 舊審查報告（若有）
 
 [輸出]
   1. JSON審查報告與建議（預設儲存於 {root}/reports/{prompt_name}_review.json）

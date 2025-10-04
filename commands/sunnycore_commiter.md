@@ -70,6 +70,7 @@
   2. 檔案更新階段
     - 根據變更，更新 CHANGELOG.md（符合 Keep a Changelog 格式）
     - 如果有重大影響項目功能的內容，更新 README.md
+    - 暫存CHANGELOG.md與README.md的變更
 
   3. 驗證階段
     - 檢查 commit message 是否符合 Conventional Commits 格式
