@@ -206,53 +206,94 @@ download_file() {
 download_directory() {
     local dir_name=$1
     local dest_dir=$2
-    
+
     log_info "獲取 ${dir_name} 目錄內容..."
-    
+
     # 使用 GitHub API 獲取目錄內容
     local api_response=$(curl -fsSL "${API_URL}/${dir_name}?ref=main")
-    
+
     if [ $? -ne 0 ]; then
         log_error "無法獲取 ${dir_name} 目錄內容"
         return 1
     fi
-    
-    # 解析 JSON 獲取所有文件的下載 URL
-    # 使用更健壯的方法提取 download_url
-    local file_count=0
-    local urls=()
-    
-    # 方法 1: 嘗試使用 grep 和 sed 提取（容錯性更強的版本）
-    # 將 JSON 數組展開，每個屬性一行，然後提取 download_url
-    while IFS= read -r url; do
-        # 移除引號和空格
-        url=$(echo "$url" | sed 's/^[[:space:]]*"//' | sed 's/"[[:space:]]*,*[[:space:]]*$//' | sed 's/"$//')
-        
-        # 跳過空 URL、null 或包含 "null" 的行
-        if [ -n "$url" ] && [ "$url" != "null" ] && [[ "$url" =~ ^https?:// ]]; then
-            urls+=("$url")
-        fi
-    done < <(echo "${api_response}" | grep -oE '"download_url"[[:space:]]*:[[:space:]]*"[^"]*"' | cut -d'"' -f4)
-    
-    # 檢查是否找到文件
-    if [ ${#urls[@]} -eq 0 ]; then
-        log_warning "${dir_name} 目錄中沒有找到文件"
+
+    # 檢查 API 響應是否為空或無效
+    if [ -z "$api_response" ] || [ "$api_response" = "null" ] || [ "$api_response" = "[]" ]; then
+        log_warning "${dir_name} 目錄中沒有找到文件或目錄不存在"
         return 0
     fi
-    
-    # 下載每個文件
-    for url in "${urls[@]}"; do
-        local filename=$(basename "$url")
-        
-        # 下載文件，如果失敗則立即返回錯誤
-        if ! download_file "$url" "${dest_dir}/${filename}"; then
-            log_error "下載 ${filename} 失敗，停止安裝"
-            return 1
-        fi
-        
-        file_count=$((file_count + 1))
-    done
-    
+
+    # 解析 JSON 獲取所有文件的下載 URL
+    local file_count=0
+
+    # 使用 Python 或 jq 來解析 JSON（如果有的話）
+    if command -v python3 &> /dev/null; then
+        # 使用 Python 解析 JSON
+        while IFS= read -r url; do
+            if [ -n "$url" ] && [ "$url" != "null" ]; then
+                local filename=$(basename "$url")
+                if ! download_file "$url" "${dest_dir}/${filename}"; then
+                    log_error "下載 ${filename} 失敗，停止安裝"
+                    return 1
+                fi
+                file_count=$((file_count + 1))
+            fi
+        done < <(echo "$api_response" | python3 -c "
+import json
+import sys
+try:
+    data = json.load(sys.stdin)
+    for item in data:
+        if item.get('type') == 'file' and item.get('download_url'):
+            print(item['download_url'])
+except Exception as e:
+    sys.exit(1)
+")
+    elif command -v jq &> /dev/null; then
+        # 使用 jq 解析 JSON
+        while IFS= read -r url; do
+            if [ -n "$url" ] && [ "$url" != "null" ]; then
+                local filename=$(basename "$url")
+                if ! download_file "$url" "${dest_dir}/${filename}"; then
+                    log_error "下載 ${filename} 失敗，停止安裝"
+                    return 1
+                fi
+                file_count=$((file_count + 1))
+            fi
+        done < <(echo "$api_response" | jq -r '.[] | select(.type == "file") | .download_url')
+    else
+        # 備用方法：使用 grep 和 sed（改進版本）
+        log_warning "未找到 python3 或 jq，使用備用解析方法"
+
+        # 提取所有 download_url
+        local urls=()
+        while IFS= read -r line; do
+            # 更精確的正則表達式來提取 download_url
+            if [[ "$line" =~ \"download_url\"[[:space:]]*:[[:space:]]*\"([^\"]+)\" ]]; then
+                local url="${BASH_REMATCH[1]}"
+                if [ -n "$url" ] && [ "$url" != "null" ] && [[ "$url" =~ ^https?:// ]]; then
+                    urls+=("$url")
+                fi
+            fi
+        done <<< "$api_response"
+
+        # 下載每個文件
+        for url in "${urls[@]}"; do
+            local filename=$(basename "$url")
+            if ! download_file "$url" "${dest_dir}/${filename}"; then
+                log_error "下載 ${filename} 失敗，停止安裝"
+                return 1
+            fi
+            file_count=$((file_count + 1))
+        done
+    fi
+
+    # 檢查解析是否成功
+    if [ $file_count -eq 0 ]; then
+        log_warning "${dir_name} 目錄中沒有找到可下載的文件"
+        return 0
+    fi
+
     log_success "${dir_name} 目錄下載完成（共 ${file_count} 個文件）"
     return 0
 }
