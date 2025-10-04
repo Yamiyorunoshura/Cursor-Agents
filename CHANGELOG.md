@@ -7,6 +7,17 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.2.2] - 2025-10-04
+
+### Added
+- 新增 Initer Agent 分支保護規則設定功能
+- 新增 4 種分支保護規則等級（基礎、標準、嚴格、自訂）
+- 新增分支保護規則設定階段（步驟4），支援互動式配置
+
+### Changed
+- 擴展 Initer Agent 輸出項目，新增分支保護規則設定
+- 更新 Initer Agent DoD，加入分支保護規則驗證項
+
 ## [0.2.1] - 2025-10-04
 
 ### Added

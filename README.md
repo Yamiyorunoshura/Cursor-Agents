@@ -33,6 +33,7 @@
    - 支援多種 License 類型選擇（MIT、Apache 2.0、GPL-3.0 等）
    - 自動建立 GitHub 遠端倉庫並推送
    - 根據專案類型生成對應的 .gitignore
+   - 支援分支保護規則設定（基礎、標準、嚴格、自訂 4 種等級）
 
 ## 🚀 快速開始
 
@@ -87,6 +88,7 @@ curl -fsSL https://raw.githubusercontent.com/Yamiyorunoshura/Cursor-Agents/main/
 - 生成 .gitignore 和 LICENSE 檔案
 - 執行 initial commit
 - 建立 GitHub 遠端倉庫並推送
+- 可選設定分支保護規則（防止強制推送、要求 PR 審查等）
 
 ## 📁 專案結構
 
@@ -149,6 +151,7 @@ cursor-agents/
 - ✅ 多種 License 支援（MIT、Apache 2.0、GPL-3.0、BSD-3-Clause、Unlicense）
 - ✅ 根據專案類型生成 .gitignore（Node.js、Python、Java、Go、Rust、React、Vue、通用）
 - ✅ GitHub CLI 整合（自動建立遠端倉庫）
+- ✅ 分支保護規則設定（4 種等級：基礎、標準、嚴格、自訂）
 - ✅ 檔案覆蓋保護機制
 
 ## 🛠️ 工具整合
