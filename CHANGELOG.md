@@ -7,6 +7,14 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.2.3] - 2025-10-04
+
+### Added
+- 命令文件支援雙路徑規則載入（專案內 `{root}/.cursor/rules/` 或全域 `~/.cursor/rules/`）
+
+### Changed
+- 更新所有命令文件（commiter、initer、prompt-optimiser、prompt-reviewer），支援全域規則檔案路徑
+
 ## [0.2.2] - 2025-10-04
 
 ### Added
