@@ -34,14 +34,14 @@
 執行以下命令安裝 Cursor AI Agents：
 
 ```bash
-curl -fsSL https://raw.githubusercontent.com/YOUR_USERNAME/cursor-agents/main/install.sh | bash
+curl -fsSL https://raw.githubusercontent.com/Yamiyorunoshura/Cursor-Agents/main/install.sh | bash
 ```
 
 或手動安裝：
 
 ```bash
-git clone https://github.com/YOUR_USERNAME/cursor-agents.git
-cd cursor-agents
+git clone https://github.com/Yamiyorunoshura/Cursor-Agents.git
+cd Cursor-Agents
 ./install.sh
 ```
 

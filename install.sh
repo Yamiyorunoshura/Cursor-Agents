@@ -12,8 +12,8 @@ YELLOW='\033[1;33m'
 BLUE='\033[0;34m'
 NC='\033[0m' # No Color
 
-# 遠端倉庫 URL（安裝後會更新為實際連結）
-REPO_URL="https://github.com/YOUR_USERNAME/cursor-agents"
+# 遠端倉庫 URL
+REPO_URL="https://github.com/Yamiyorunoshura/Cursor-Agents"
 RAW_URL="${REPO_URL}/raw/main"
 
 # Cursor 配置目錄
