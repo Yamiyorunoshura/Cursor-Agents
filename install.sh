@@ -218,27 +218,41 @@ download_directory() {
     fi
     
     # 解析 JSON 獲取所有文件的下載 URL
-    # 使用 grep 和 sed 提取 download_url 和 name
+    # 使用 grep 和 sed 提取 download_url，存儲到數組
     local file_count=0
+    local urls=()
     
-    echo "${api_response}" | grep -o '"download_url":"[^"]*"' | while IFS=':' read -r key url; do
-        # 移除引號
-        url=$(echo "$url" | sed 's/"//g')
+    # 先將所有 URL 收集到數組中
+    while IFS= read -r line; do
+        # 移除 "download_url":" 前綴和結尾的引號
+        local url=$(echo "$line" | sed 's/"download_url":"//' | sed 's/"$//')
         
-        # 獲取文件名
+        # 跳過空 URL 或 null
+        if [ -n "$url" ] && [ "$url" != "null" ]; then
+            urls+=("$url")
+        fi
+    done < <(echo "${api_response}" | grep -o '"download_url":"[^"]*"')
+    
+    # 檢查是否找到文件
+    if [ ${#urls[@]} -eq 0 ]; then
+        log_warning "${dir_name} 目錄中沒有找到文件"
+        return 0
+    fi
+    
+    # 下載每個文件
+    for url in "${urls[@]}"; do
         local filename=$(basename "$url")
         
-        # 跳過空 URL
-        if [ -z "$url" ] || [ "$url" = "null" ]; then
-            continue
+        # 下載文件，如果失敗則立即返回錯誤
+        if ! download_file "$url" "${dest_dir}/${filename}"; then
+            log_error "下載 ${filename} 失敗，停止安裝"
+            return 1
         fi
         
-        # 下載文件
-        download_file "$url" "${dest_dir}/${filename}" || return 1
         file_count=$((file_count + 1))
     done
     
-    log_success "${dir_name} 目錄下載完成"
+    log_success "${dir_name} 目錄下載完成（共 ${file_count} 個文件）"
     return 0
 }
 
