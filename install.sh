@@ -144,7 +144,8 @@ determine_install_path() {
                         INSTALL_MODE="project"
                         ;;
                     3)
-                        if read -p "請輸入安裝路徑: " CURSOR_DIR < /dev/tty 2>/dev/null; then
+                        echo -n "請輸入安裝路徑: " >&2
+                        if read CURSOR_DIR < /dev/tty 2>/dev/null; then
                             INSTALL_MODE="custom"
                         else
                             log_warning "無法讀取路徑，使用全域安裝"
@@ -157,8 +158,31 @@ determine_install_path() {
                         ;;
                 esac
             else
-                log_warning "無法讀取用戶輸入，使用預設值（全域安裝）"
-                INSTALL_MODE="global"
+                # 如果 /dev/tty 讀取失敗，嘗試從 stdin 讀取（可能是在某些環境下）
+                log_info "嘗試從標準輸入讀取選項..."
+                if read -t 5 choice 2>/dev/null; then
+                    case "${choice:-1}" in
+                        1)
+                            INSTALL_MODE="global"
+                            ;;
+                        2)
+                            INSTALL_MODE="project"
+                            ;;
+                        3)
+                            read -p "請輸入安裝路徑: " -t 5 CURSOR_DIR 2>/dev/null || {
+                                log_warning "無法讀取路徑，使用全域安裝"
+                                INSTALL_MODE="global"
+                            }
+                            ;;
+                        *)
+                            log_warning "無效選項，使用預設值（全域安裝）"
+                            INSTALL_MODE="global"
+                            ;;
+                    esac
+                else
+                    log_warning "無法讀取用戶輸入，使用預設值（全域安裝）"
+                    INSTALL_MODE="global"
+                fi
             fi
         else
             # 完全無法互動時使用預設值
