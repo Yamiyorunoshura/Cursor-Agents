@@ -218,20 +218,21 @@ download_directory() {
     fi
     
     # 解析 JSON 獲取所有文件的下載 URL
-    # 使用 grep 和 sed 提取 download_url，存儲到數組
+    # 使用更健壯的方法提取 download_url
     local file_count=0
     local urls=()
     
-    # 先將所有 URL 收集到數組中
-    while IFS= read -r line; do
-        # 移除 "download_url":" 前綴和結尾的引號
-        local url=$(echo "$line" | sed 's/"download_url":"//' | sed 's/"$//')
+    # 方法 1: 嘗試使用 grep 和 sed 提取（容錯性更強的版本）
+    # 將 JSON 數組展開，每個屬性一行，然後提取 download_url
+    while IFS= read -r url; do
+        # 移除引號和空格
+        url=$(echo "$url" | sed 's/^[[:space:]]*"//' | sed 's/"[[:space:]]*,*[[:space:]]*$//' | sed 's/"$//')
         
-        # 跳過空 URL 或 null
-        if [ -n "$url" ] && [ "$url" != "null" ]; then
+        # 跳過空 URL、null 或包含 "null" 的行
+        if [ -n "$url" ] && [ "$url" != "null" ] && [[ "$url" =~ ^https?:// ]]; then
             urls+=("$url")
         fi
-    done < <(echo "${api_response}" | grep -o '"download_url":"[^"]*"')
+    done < <(echo "${api_response}" | grep -oE '"download_url"[[:space:]]*:[[:space:]]*"[^"]*"' | cut -d'"' -f4)
     
     # 檢查是否找到文件
     if [ ${#urls[@]} -eq 0 ]; then
