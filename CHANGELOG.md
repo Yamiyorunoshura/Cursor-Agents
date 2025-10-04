@@ -7,6 +7,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.3.1] - 2025-10-04
+
+### Changed
+- 更新 Prompt Reviewer Agent 輸入說明，新增「舊審查報告（若有）」選項以支援迭代審查
+
 ## [0.3.0] - 2025-10-04
 
 ### Changed
