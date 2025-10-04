@@ -7,6 +7,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Changed
+- 簡化 README.md 安裝說明，強調安裝腳本的互動式體驗
+- 移除 install.sh 安裝完成後的使用指南輸出，減少冗餘資訊
+
 ## [0.2.0] - 2025-10-04
 
 ### Added
