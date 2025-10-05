@@ -7,6 +7,15 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.3.3] - 2025-10-05
+
+### Changed
+- 增強 Prompt Reviewer Agent 的 non_issues 保留機制，確保生成新報告時保留並合併舊報告的所有 non_issues
+- 在步驟說明中明確規範歷史參照時的 non_issues 處理邏輯
+
+### Added
+- 新增完整的 JSON 審查報告格式範例於 `[Example]` 區塊
+
 ## [0.3.2] - 2025-10-05
 
 ### Changed
