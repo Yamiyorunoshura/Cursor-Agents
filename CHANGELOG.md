@@ -7,6 +7,18 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.3.2] - 2025-10-05
+
+### Changed
+- 將所有命令文件從繁體中文翻譯為英文，提升國際化支援
+- 更新 .gitignore，新增 reports/ 目錄至忽略清單
+
+### Files Updated
+- commands/sunnycore_commiter.md (English version)
+- commands/sunnycore_initer.md (English version)
+- commands/sunnycore_prompt-optimiser.md (English version)
+- commands/sunnycore_prompt-reviewer.md (English version)
+
 ## [0.3.1] - 2025-10-04
 
 ### Changed
