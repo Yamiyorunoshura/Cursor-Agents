@@ -7,6 +7,16 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.4.1] - 2025-10-06
+
+### Fixed
+- 修復 install.py 在 curl | python3 環境下無法進行互動式輸入的問題（現支援 /dev/tty）
+- 改進 install.py 的用戶體驗，提供更清晰的選項提示與錯誤處理
+
+### Changed
+- 新增 Commiter Agent 處理長 diff 的策略文檔（4 種策略：臨時文件、無分頁、分段、組合）
+- 移除 install.sh，完全採用 Python 安裝腳本（install.py）
+
 ## [0.4.0] - 2025-10-06
 
 ### Added
