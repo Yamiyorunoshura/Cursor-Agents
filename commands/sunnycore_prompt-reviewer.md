@@ -1,6 +1,6 @@
 [Input]
   1. User-attached prompt
-  2. Old review report (if any)
+  2. reports/{prompt_name}_review.json (if any)
 
 [Output]
   1. JSON review report and recommendations (default saved to {root}/reports/{prompt_name}_review.json)
