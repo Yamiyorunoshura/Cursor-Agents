@@ -63,6 +63,7 @@
 
 [Steps]
   0. Understanding confirmation phase
+    - Read all the [input] files
     - Read and analyze the prompt to understand its purpose, type, and core intent
     - Present understanding to user: prompt type, main objectives, key constraints, expected outputs
     - **Conditional branch**:
