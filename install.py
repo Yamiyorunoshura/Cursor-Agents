@@ -4,17 +4,15 @@ Cursor AI Agents 安裝腳本 (Python 版本)
 用途：從 GitHub 下載最新版本並安裝至 Cursor 配置目錄
 
 使用方法：
-  全域安裝（預設）：
+  互動式安裝（推薦）：
     python3 install.py
   或：curl -fsSL https://raw.githubusercontent.com/Yamiyorunoshura/Cursor-Agents/main/install.py | python3
+  註：支援在 curl 環境下進行互動式選擇安裝模式
 
-  專案安裝（當前目錄）：
-    python3 install.py project
-  或：INSTALL_MODE=project python3 install.py
-
-  自訂路徑安裝：
-    python3 install.py /custom/path
-  或：INSTALL_PATH=/custom/path python3 install.py
+  直接指定模式：
+    專案安裝：python3 install.py project 或 INSTALL_MODE=project python3 install.py
+    全域安裝：python3 install.py global 或 INSTALL_MODE=global python3 install.py
+    自訂路徑：python3 install.py /custom/path 或 INSTALL_PATH=/custom/path python3 install.py
 """
 
 import os
@@ -121,30 +119,64 @@ def determine_install_path(args: argparse.Namespace) -> Tuple[str, str, str]:
     
     # 優先級 4: 互動式選擇
     if not install_mode and not cursor_dir:
+        # 嘗試獲取互動式輸入（支援 curl | python3 情境）
+        input_source = None
+        
         if sys.stdin.isatty():
+            # 標準輸入是 tty，直接使用
+            input_source = sys.stdin
+        else:
+            # 標準輸入不是 tty（如 curl | python3），嘗試使用 /dev/tty
+            try:
+                if sys.platform != 'win32':
+                    input_source = open('/dev/tty', 'r')
+                    log_info("已連接到終端進行互動式輸入")
+            except (OSError, IOError):
+                pass
+        
+        if input_source:
             print()
             log_info("請選擇安裝模式：")
             print("  1) 全域安裝（安裝到 ~/.cursor/，對所有專案生效）")
             print("  2) 專案安裝（安裝到當前目錄 ./.cursor/，只對當前專案生效）")
             print("  3) 自訂路徑")
             print()
+            sys.stdout.write(f"{Colors.YELLOW}請輸入選項 [1-3]{Colors.NC} (預設為 1，直接按 Enter 使用預設值): ")
+            sys.stdout.flush()
             
             try:
-                choice = input("請輸入選項 [1-3] (預設: 1): ").strip() or '1'
+                choice = input_source.readline().strip() or '1'
                 
                 if choice == '1':
                     install_mode = 'global'
+                    log_success("已選擇：全域安裝")
                 elif choice == '2':
                     install_mode = 'project'
+                    log_success("已選擇：專案安裝")
                 elif choice == '3':
-                    cursor_dir = input("請輸入安裝路徑: ").strip()
-                    install_mode = 'custom'
+                    print()
+                    sys.stdout.write(f"{Colors.YELLOW}請輸入安裝路徑{Colors.NC} (支援 ~ 符號): ")
+                    sys.stdout.flush()
+                    cursor_dir = input_source.readline().strip()
+                    if not cursor_dir:
+                        log_warning("未輸入路徑，使用預設值（全域安裝）")
+                        install_mode = 'global'
+                    else:
+                        install_mode = 'custom'
+                        log_success(f"已選擇：自訂路徑 ({cursor_dir})")
                 else:
-                    log_warning("無效選項，使用預設值（全域安裝）")
+                    log_warning(f"無效選項「{choice}」，使用預設值（全域安裝）")
                     install_mode = 'global'
             except (EOFError, KeyboardInterrupt):
                 log_warning("\n無法讀取用戶輸入，使用預設值（全域安裝）")
                 install_mode = 'global'
+            finally:
+                # 如果打開了 /dev/tty，需要關閉它
+                if input_source != sys.stdin:
+                    try:
+                        input_source.close()
+                    except:
+                        pass
         else:
             log_info("無法進行互動式選擇，使用預設值（全域安裝）")
             install_mode = 'global'

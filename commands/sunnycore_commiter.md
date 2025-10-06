@@ -1,5 +1,10 @@
 [Input]
   1. git diff --staged (changes staged to index)
+     - For long diffs, use one of the following strategies to avoid truncation:
+       * Strategy 1 (Temporary file): git diff --staged > /tmp/staged_diff.txt then read file
+       * Strategy 2 (No pager): git diff --staged --no-pager
+       * Strategy 3 (Segmented): First use git diff --staged --stat to get summary, then git diff --staged -- <specific_files> for important files
+       * Strategy 4 (Combined): Use git diff --staged --stat for overview + git diff --staged --unified=3 for context
   2. *.lock file (version number)
 
 [Output]
@@ -62,15 +67,24 @@
   1. **todo_write**
     - [Step 1: Create todo items]
     - [All steps except Step 0: Track task progress]
-  2. **glob_file_search**
-    - [Step 4.3.1: Search for version lock files in project root]
 
 [Steps]
   0. Pre-check phase
+    - Get staged diff using anti-truncation strategy:
+        * Priority: Try Strategy 1 (Temporary file) first for best reliability
+        * Execution steps for Strategy 1:
+          1. Execute: git diff --staged > /tmp/staged_diff.txt
+          2. Use read_file to read /tmp/staged_diff.txt
+          3. Store diff content for subsequent analysis
+        * Fallback: If Strategy 1 fails, try Strategy 3 (Segmented approach):
+          1. Execute: git diff --staged --stat to get file list and change summary
+          2. Execute: git diff --staged -- <file_path> for each important file
+          3. Combine results for analysis
     - Verify diff is non-empty and parseable
     - If diff is empty or abnormal, terminate and prompt user
     - Check if CHANGELOG.md and README.md exist, create initial files if not
     - Check if diff contains sensitive information, flag for sanitization if present
+    - Clean up temporary files after use (delete /tmp/staged_diff.txt if created)
 
   1. Analysis phase
     - Analyze diff to understand the impact of changes on the project
@@ -164,3 +178,4 @@
   - [ ] All validation items have passed (format check, content consistency, security check)
   - [ ] Git operations have been successfully executed (commit, branch, merge, push)
   - [ ] If on main branch, successfully created isolated branch and completed merge and push
+  - [ ] Temporary files have been cleaned up (e.g., /tmp/staged_diff.txt)
