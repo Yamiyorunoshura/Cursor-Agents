@@ -30,15 +30,15 @@
 
 [Tools]
   1. **todo_write**
-    - [Step 1: Create todo list containing all optimization items in preparation phase]
-    - [Step 2: Track task progress, update status upon completion of each item]
-    - [Step 3: Track destructive optimization progress, update status upon completion of each item]
+    - [Step 1: Create todo list containing all optimization items]
+    - [Step 2: Track accepted modifications]
+    - [Step 3: Update status upon completion]
     - Usage guidance: Each todo item should correspond to one optimization recommendation, include report_item_id for traceability
   2. **sequentialthinking**
-    - [Step 1: Reason about optimization methods corresponding to optimization recommendations]
-    - [Step 3: Reason about execution methods for destructive optimizations]
+    - [Step 1: Reason about optimization methods]
+    - [Step 2: Analyze user's modification selection]
 
-[Tool Guidance]
+[Tool-Guidance]
   1. **sequentialthinking**
     - Simple task reasoning: 1-3 totalThoughts
     - Medium task reasoning: 3-5 totalThoughts
@@ -51,28 +51,59 @@
     - Read review report and original prompt
     - Understand all optimization recommendations and evaluate their reasonableness
     - Perform critical analysis of unreasonable recommendations and record rebuttal reasons
-    - Devise optimization methods
-    - Create todo list to track progress in preparation, optimization, and interaction phases
+    - Categorize all recommendations into non-destructive and destructive
+    - Create todo list to track progress
 
-  2. Optimization phase
-    - Identify non-destructive optimization recommendations in report
-    - Perform non-destructive optimizations on prompt according to your determined optimization methods
+  2. Modification confirmation phase
+    - List ALL modifications (both non-destructive and destructive) with:
+      * Original text (with line numbers)
+      * Proposed modification
+      * Optimization reason and evidence (report_item_id)
+      * Impact assessment (for destructive ones)
+    - Ask user: "Which modifications do you want to accept? [List numbers or 'all']"
+    - Wait for user response and record accepted modifications
+    - Update todo list with accepted items
+
+  3. Execution phase
+    - Execute all accepted non-destructive optimizations
+    - Execute all accepted destructive optimizations
     - Update todo list status upon completion of each optimization
-
-  3. Interaction phase
-    - List all destructive optimization recommendations in list form, each including: optimization content, impact scope, evidence source
-    - Ask user item by item: "Execute this destructive optimization? [Yes/No/Skip]"
-    - Wait for user response, if agreed update todo list and execute that optimization
-    - Complete all destructive optimization recommendations agreed by user
+    - Ensure all modifications maintain traceability to review report
 
   4. Verification phase
     - Check if all DoD items are satisfied
     - Verify syntax correctness and completeness of optimized prompt
-    - Generate optimization summary report (including non-destructive optimization list, destructive optimization list, change evidence)
-    - Confirm all todo items are completed
+    - Generate optimization summary with comparison examples
+    - Confirm all accepted todo items are completed
 
 [DoD]
-  - [ ] Optimized prompt has been saved to {root}/path/to/original_prompt.md
-  - [ ] Optimization summary has been generated, including all change records and evidence (report_item_id, line_range)
-  - [ ] All todo items have been completed (todo list status is completed)
-  - [ ] Destructive optimizations have been confirmed by user and executed (if any)
+  - [ ] All modifications presented to user with before/after comparison
+  - [ ] User has confirmed which modifications to accept
+  - [ ] Optimized prompt saved with only accepted modifications
+  - [ ] Optimization summary generated with comparison examples and evidence
+  - [ ] All accepted todo items completed
+
+[Example]
+## Modification Comparison Examples
+  **Non-destructive example:**
+  ```
+  Original (L{line_number}):
+  {original_text}
+      
+  Modified:
+  {modified_text}
+      
+  Reason: {optimization_reason} (report_item_id: {id})
+  ```
+      
+  **Destructive example:**
+  ```
+  Original (L{line_number}):
+  {original_text}
+      
+  Proposed:
+  {proposed_text}
+      
+  Impact: {impact_description}
+  User decision: [Accepted/Rejected]
+  ```
