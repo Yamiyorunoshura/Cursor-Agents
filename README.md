@@ -39,18 +39,48 @@
 
 ### 安裝
 
+#### 方法一：Python 安裝（推薦，支援並行下載）
+
 使用以下命令一鍵安裝，腳本會自動提供互動式選單讓你選擇安裝模式：
+
+```bash
+# 使用 curl 下載並執行
+curl -fsSL https://raw.githubusercontent.com/Yamiyorunoshura/Cursor-Agents/main/install.py | python3
+
+# 或直接下載後執行
+curl -fsSL https://raw.githubusercontent.com/Yamiyorunoshura/Cursor-Agents/main/install.py -o install.py
+python3 install.py
+
+# 指定並行下載連線數（預設 10）
+python3 install.py --workers 20
+```
+
+#### 方法二：Bash 安裝（傳統方式）
 
 ```bash
 curl -fsSL https://raw.githubusercontent.com/Yamiyorunoshura/Cursor-Agents/main/install.sh | bash
 ```
 
-安裝模式說明：
+#### 安裝模式說明
+
 - **全域安裝**（推薦）：安裝到 `~/.cursor/`，對所有 Cursor 專案生效
 - **專案安裝**：安裝到當前專案的 `.cursor/`，只對當前專案生效（適合團隊協作）
 - **自訂路徑**：安裝到指定路徑（適合特殊需求）
 
-> 💡 提示：安裝腳本支援完整的互動式體驗，會引導你完成所有設定。
+#### 進階用法
+
+```bash
+# 直接指定安裝模式（無需互動）
+python3 install.py global           # 全域安裝
+python3 install.py project          # 專案安裝
+python3 install.py /custom/path     # 自訂路徑安裝
+
+# 使用環境變數
+INSTALL_MODE=project python3 install.py
+INSTALL_PATH=/custom/path python3 install.py
+```
+
+> 💡 提示：Python 版本支援並行下載，安裝速度更快！腳本會自動提供互動式選單讓你選擇安裝模式。
 
 ### 使用方法
 
@@ -100,7 +130,8 @@ cursor-agents/
 │   ├── sunnycore_prompt-optimiser.md
 │   └── sunnycore_prompt-reviewer.md
 ├── cursor-agents.lock           # 版本鎖定文件
-├── install.sh                   # 安裝腳本
+├── install.py                   # Python 安裝腳本（推薦，支援並行下載）
+├── install.sh                   # Bash 安裝腳本（傳統方式）
 ├── .gitignore
 ├── CHANGELOG.md
 ├── LICENSE

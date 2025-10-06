@@ -33,7 +33,7 @@
   1. **todo_write**: Create and track task lists
     - Usage scenario: [Step 2: Create todo to track progress]
   2. **sequentialthinking**: Structured reasoning tool for complex logical analysis
-    - Usage scenario: [Step 2: Reason whether prompt meets review standards]
+    - Usage scenario: [Step 0: Analyze prompt understanding; Step 2: Reason whether prompt meets review standards]
 
 [Tool-Guidance]
   1. **sequentialthinking**
@@ -62,6 +62,14 @@
   - Report must align: score ↔ evidence ↔ recommendation
 
 [Steps]
+  0. Understanding confirmation phase
+    - Read and analyze the prompt to understand its purpose, type, and core intent
+    - Present understanding to user: prompt type, main objectives, key constraints, expected outputs
+    - **Conditional branch**:
+      * IF user confirms understanding is correct → proceed to step 1 (Preparation phase)
+      * ELSE → adjust understanding based on user feedback, re-present until user confirms → then proceed to step 1
+    - Record final confirmed understanding as basis for establishing review standards
+
   1. Preparation phase
     - Clarify purpose and objectives
     - Devise 5-8 review dimensions; 3-5 review items per dimension
@@ -97,6 +105,7 @@
     - Entries marked as "non-issues" must be fully recorded in review report (see [Review Guidance])
 
 [DoD]
+  - [ ] User has confirmed understanding of prompt before establishing review standards
   - [ ] Each dimension score is traceable, and total score has been calculated
   - [ ] Review report (default saved to {root}/reports/{prompt_name}_review.json)
   - [ ] Destructive optimization recommendations have been identified and listed separately

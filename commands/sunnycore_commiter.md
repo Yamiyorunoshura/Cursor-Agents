@@ -1,5 +1,6 @@
 [Input]
   1. git diff --staged (changes staged to index)
+  2. *.lock file (version number)
 
 [Output]
   1. Commit message compliant with modern project management
@@ -29,6 +30,13 @@
     - refactor: Refactoring (no new features or bug fixes)
     - test: Adding or modifying tests
     - chore: Build tools or auxiliary tool changes
+    
+  4. **Version update and README.md update rules**
+    - **Major version update** (e.g., 1.0.0 → 2.0.0): **MUST** update README.md
+    - **Minor version update** (e.g., 1.1.0 → 1.2.0): Update README.md if:
+        * README.md does not correctly describe all existing features, OR
+        * New features are added
+    - **Patch version update** (e.g., 1.1.0 → 1.1.1): No need to update README.md (unless it affects user usage patterns)
 
 [Skills]
   1. **Deep understanding capability**: Effectively understand the impact of changes on the project
@@ -67,7 +75,12 @@
   1. Analysis phase
     - Analyze diff to understand the impact of changes on the project
     - Identify affected functional modules and file scope
-    - Determine if README.md needs updating (major feature changes)
+    - Determine if README.md needs updating based on:
+        * Major feature changes (see Definition 1)
+        * Version update rules (see Definition 4):
+            - Parse version number from *.lock file (if exists)
+            - Compare with previous version to determine update type (major/minor/patch)
+            - Apply corresponding README.md update rules
     - Create todo items based on actual tasks
 
   2. File update phase

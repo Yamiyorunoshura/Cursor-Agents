@@ -7,6 +7,25 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.4.0] - 2025-10-06
+
+### Added
+- 新增 Python 安裝腳本 (`install.py`)，支援並行下載功能（預設 10 個並行連線）
+- 新增 Prompt Reviewer Agent 理解確認階段（Step 0），在建立審查標準前先確認對 prompt 的理解
+- 新增 Prompt Optimiser Agent 修改確認階段（Step 2），展示所有修改並由用戶確認後再執行
+- 新增 Commiter Agent 版本更新規則，明確主要/次要/修補版本的 README.md 更新邏輯
+
+### Changed
+- 改進安裝體驗：Python 腳本支援 `--workers` 參數自訂並行連線數
+- 改進 Prompt Optimiser 工作流程：所有修改（破壞性/非破壞性）統一展示並確認
+- 改進 Commiter 輸入項目：新增 `*.lock` 文件作為版本號來源
+- 更新 README.md 安裝說明：Python 安裝為推薦方式（方法一），Bash 安裝為傳統方式（方法二）
+
+### Features
+- **Python 安裝器**: 並行下載、互動式選單、環境變數支援、自訂路徑安裝
+- **Prompt Reviewer**: 理解確認機制，確保審查標準符合 prompt 實際意圖
+- **Prompt Optimiser**: 修改前確認機制，提供完整的修改對比和影響評估
+
 ## [0.3.3] - 2025-10-05
 
 ### Changed
