@@ -7,6 +7,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.4.2] - 2025-10-06
+
+### Fixed
+- 修復 Prompt Reviewer Agent 理解確認階段（Step 0）遺漏讀取輸入文件的步驟
+
 ## [0.4.1] - 2025-10-06
 
 ### Fixed
