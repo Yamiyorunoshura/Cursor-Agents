@@ -21,7 +21,6 @@
     - GPL-3.0: Copyleft license, requires derivative works to be open source
     - BSD-3-Clause: Simple permissive license
     - Unlicense: Waive all copyrights, enter public domain
-    
   2. **Supported project types** (for .gitignore generation)
     - Node.js: JavaScript/TypeScript projects (npm/yarn/pnpm)
     - Python: Python projects (pip/conda/poetry)
@@ -31,7 +30,6 @@
     - React: React frontend projects
     - Vue: Vue.js frontend projects
     - Generic: Basic IDE and OS file ignores
-    
   3. **Repository visibility**
     - public: Public repository, visible to everyone
     - private: Private repository, visible only to authorized users
@@ -53,30 +51,19 @@
   2. Must confirm user has installed GitHub CLI (`gh`) and completed authentication, provide installation guide if not installed
   3. LICENSE file must use correct and complete license text
   4. All files use UTF-8 encoding
-  5. If files already exist (README.md, CHANGELOG.md, LICENSE, .gitignore), must ask user whether to overwrite
+  5. If files already exist (README.md, CHANGELOG.md, LICENSE, .gitignore), must ask user whether to overwrite; if user rejects overwriting all files, terminate initialization with explanation
   6. Project name must not contain special characters (only letters, numbers, hyphens, underscores allowed)
   7. Commit messages must comply with Conventional Commits format (see https://www.conventionalcommits.org/)
   8. Branch protection rules can only be configured after GitHub remote repository is successfully created
   9. Configuring branch protection rules requires admin permissions on the repository
-  10. Recommend executing in Unix-like environment (macOS/Linux) or Windows Git Bash, ensure generated files use LF line endings
+  10. Recommend executing in Unix-like environment (macOS, Linux, or Windows Git Bash), ensure generated files use LF line endings
   11. Command examples using `{variable_name}` are placeholders that must be replaced with actual values during execution
   12. Critical step failures (git commit) terminate execution; network failures (gh repo create) retain progress and prompt user; optional feature failures (branch protection) downgrade gracefully
   13. Project name format validation: Maximum 3 retries; terminate and prompt user if still non-compliant
   14. Git operations: Stage only actually created/overwritten files; skip files user chose not to overwrite
   15. GitHub repository creation: Check network connectivity (gh api user) before proceeding
-  16. Branch protection configuration levels:
-    - Basic: Prevent force push and branch deletion
-    - Standard: Basic + require at least 1 PR reviewer approval
-    - Strict: Standard + require status checks + enforce rules for admins
-    - Custom: User-defined combination of protection rules
-  17. Initial commit message: "chore: initial commit"
-  18. Copyright holder for LICENSE: Use `git config user.name` as default, prompt user if empty
-
-[Tools]
-  1. **todo_write**
-    - [Step 0: Create todo list after completing pre-checks, listing all initialization tasks]
-    - [Step 1-4: Update task status after completing each sub-phase (file creation, git operations, branch protection configuration)]
-    - [Step 5: Mark all tasks as completed during verification phase]
+  16. Initial commit message: "chore: initial commit"
+  17. Copyright holder for LICENSE: Use `git config user.name` as default, prompt user if empty
 
 [Steps]
   1. Verify environment and prepare for initialization
@@ -88,8 +75,8 @@
     - Outcome: Complete project configuration ready for file generation
 
   3. Create project documentation files
-    - Objective: Generate professional documentation files (README.md, CHANGELOG.md, LICENSE, .gitignore) based on user preferences
-    - Outcome: All selected documentation files created with appropriate content and format
+    - Objective: Generate professional documentation files (README.md, CHANGELOG.md, LICENSE, .gitignore) based on user preferences, only creating/overwriting files user confirmed
+    - Outcome: All user-approved documentation files created with appropriate content and format; files user rejected are skipped
 
   4. Initialize git repository and push to GitHub
     - Objective: Stage created files, execute initial commit, create GitHub remote repository, and establish remote connection
@@ -102,6 +89,12 @@
   6. Verify initialization completion
     - Objective: Confirm all files exist, git history is correct, remote connection is established, and protection rules are applied (if configured)
     - Outcome: Complete initialization summary presented to user with next steps suggestions
+
+[Tools]
+  1. **todo_write**
+    - [Before Step 1: Create todo list after completing pre-checks, listing all initialization tasks]
+    - [Steps 1-5: Update task status after completing each sub-phase (environment verification, information gathering, file creation, git operations, branch protection configuration)]
+    - [Step 6: Mark all tasks as completed during verification phase]
 
 [DoD]
   - [ ] README.md has been created (includes project name and description)

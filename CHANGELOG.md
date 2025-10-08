@@ -7,6 +7,22 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [1.1.0] - 2025-10-08
+
+### Improved
+- 優化 Commiter Agent 版本規則說明，改用表格格式提升可讀性
+- 細化 Commiter Agent 脫敏規則說明，針對不同使用場景提供明確指引
+- 改進 Commiter Agent 衝突處理流程，新增詳細的中止與通知機制
+- 精簡 Initer Agent 文檔，移除冗餘內容並調整區塊順序
+- 新增 Prompt Optimiser Agent 錯誤處理區塊，涵蓋報告文件、原始文件、執行錯誤處理
+- 改進 Prompt Optimiser Agent 非破壞性定義，明確順序調整的範圍限制
+- 更新 Prompt Reviewer Agent 工具使用說明，提升步驟描述的準確性
+
+### Changed
+- Commiter Agent 步驟 3 新增版本號更新說明（*.lock 文件）
+- Initer Agent 約束 5 改進文件覆蓋保護說明
+- Prompt Optimiser Agent 約束 1 新增 token 限制量化指標（>50 tokens）
+
 ## [1.0.0] - 2025-10-08
 
 ### Changed
