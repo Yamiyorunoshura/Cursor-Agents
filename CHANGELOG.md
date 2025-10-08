@@ -7,6 +7,21 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [1.0.0] - 2025-10-08
+
+### Changed
+- 重構所有命令文件架構，提升可讀性與可維護性
+- 新增 **Goal** 區塊：明確定義每個 Agent 的核心目標
+- 簡化 **Steps** 區塊：從詳細執行步驟改為目標導向的高層描述
+- 新增 **Example** 區塊：每個命令文件添加 3 個實例範例，提升理解與應用
+- Prompt Reviewer 輸出格式從 JSON 改為 Markdown，提升可讀性
+- Prompt Optimiser 和 Prompt Reviewer 的報告格式統一為 .md 文件
+
+### Improved
+- 優化約束描述：更清晰的異常處理原則與策略說明
+- 改進文檔結構：目標導向的步驟描述，降低學習曲線
+- 增強實例參考：提供真實場景範例，加速上手時間
+
 ## [0.4.2] - 2025-10-06
 
 ### Fixed
