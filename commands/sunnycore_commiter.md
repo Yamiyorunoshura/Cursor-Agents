@@ -39,11 +39,12 @@
     - chore: Build tools or auxiliary tool changes
     
   4. **Version update and README.md update rules**
-    - **Major version update** (e.g., 1.0.0 → 2.0.0): **MUST** update README.md
-    - **Minor version update** (e.g., 1.1.0 → 1.2.0): Update README.md if:
-        * README.md does not correctly describe all existing features, OR
-        * New features are added
-    - **Patch version update** (e.g., 1.1.0 → 1.1.1): No need to update README.md (unless it affects user usage patterns)
+    
+    | Version Type | Example | README.md Update Required | Condition |
+    |--------------|---------|---------------------------|-----------|
+    | Major (X.0.0) | 1.0.0 → 2.0.0 | **MUST update** | Always update for breaking changes |
+    | Minor (1.X.0) | 1.1.0 → 1.2.0 | **Conditional update** | Update if README doesn't describe existing features OR new features added |
+    | Patch (1.1.X) | 1.1.0 → 1.1.1 | **No update needed** | Unless it affects user usage patterns |
 
 [Skills]
   1. **Deep understanding capability**: Effectively understand the impact of changes on the project
@@ -59,15 +60,19 @@
         * Keyword detection (password, secret, key, token, etc.)
         * Email and phone number format checking
     - Sanitization rules:
-        * Masked display: Keep first 4 and last 4 characters, replace middle with ***
-        * Replace with placeholders: [API_KEY], [PASSWORD], [EMAIL]
-        * Environment variable hints: Suggest using ${ENV_VAR_NAME} instead of hardcoding
+        * Masked display: Keep first 4 and last 4 characters, replace middle with *** (for demonstration in examples)
+        * Replace with placeholders: [API_KEY], [PASSWORD], [EMAIL] (for documentation descriptions)
+        * Environment variable hints: Suggest using ${ENV_VAR_NAME} instead of hardcoding (for config files or code)
     - If sensitive information is detected, pause the process and prompt user to confirm sanitization
   5. Exception handling principles: All validation failures maximum 3 retries, retry mechanism re-executes from analysis phase; git operation failures preserve scene and prompt user to check status; sensitive information detection failures pause process awaiting user confirmation; branch creation or merge operation failures preserve state and explain specific reason
   6. Main branch commit strategy: Must use isolated branch (format: {project-name}/v{version}), then merge back to main with --no-ff
     - Version extraction: Parse from *.lock file in project root using regex pattern: ([\w-]+)\s*=\s*([0-9]+\.[0-9]+\.[0-9]+)
     - Branch naming: {project-name}/v{version} (e.g., cursor-agents/v1.7.14)
-    - Merge requirement: Check remote updates before merge; abort on conflicts
+    - Merge requirement: Check remote updates before merge; if conflicts detected:
+        * Abort merge operation (git merge --abort)
+        * Preserve isolated branch for manual resolution
+        * Notify user with conflict file list and branch name
+        * Pause process awaiting user resolution
     - Cleanup: Delete local branch after successful merge and push
   7. Non-main branch commit strategy: Commit directly on current branch and push
   8. Diff retrieval strategy (priority order):
@@ -91,8 +96,8 @@
     - Outcome: Clear understanding of change scope, commit type determined, README.md update decision made based on version change type and feature impact
 
   3. Update project documentation
-    - Objective: Synchronize CHANGELOG.md and README.md (if needed) with the actual changes
-    - Outcome: Documentation files updated and staged, ready for commit
+    - Objective: Synchronize version number in *.lock file, CHANGELOG.md, and README.md (if needed) with the actual changes
+    - Outcome: Version number updated in *.lock file, documentation files updated and staged, ready for commit
 
   4. Generate and validate commit message
     - Objective: Create a commit message that complies with Conventional Commits format and accurately describes the changes

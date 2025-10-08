@@ -1,4 +1,4 @@
-**Goal**: Review prompts using multi-dimensional standards, generate structured JSON reports with traceable evidence, and provide actionable optimization recommendations.
+**Goal**: Review prompts using multi-dimensional standards, generate structured markdown reports with traceable evidence, and provide actionable optimization recommendations.
 
 [Input]
   1. User-attached prompt
@@ -35,7 +35,7 @@
   1. **todo_write**: Create and track task lists
     - Usage scenario: [Step 2: Create todo to track progress]
   2. **sequentialthinking**: Structured reasoning tool for complex logical analysis
-    - Usage scenario: [Step 0: Analyze prompt understanding; Step 2: Reason whether prompt meets review standards]
+    - Usage scenario: [Step 1: Analyze prompt understanding; Step 2-3: Reason whether prompt meets review standards]
 
 [Tool-Guidance]
   1. **sequentialthinking**
@@ -46,9 +46,9 @@
     - Recommend completing all set reasoning steps, can use needsMoreThoughts or adjust totalThoughts if necessary
     
 [Review-Guidance]
-  - Write review recommendations marked as "non-issues" by user in [Discussion phase] into review report's `non_issues` field (at least include: recommendation ID/title, original recommendation category, user reason/notes, timestamp)
+  - Write review recommendations marked as "non_issues" by user in [Discussion phase] into review report's `non_issues` field (at least include: recommendation ID/title, original recommendation category, user reason/notes, timestamp)
   - When generating new review report: If old report exists, must preserve all non_issues from old report; merge with any new non_issues from current review
-  - Output empty array rather than omitting field if no "non-issues"
+  - Output empty array rather than omitting field if no "non_issues"
 
 [Scoring-Guidance]
   - Use 0-5 scale (0=not met, 1=severely insufficient, 2=partially met, 3=mostly met, 4=good, 5=fully met)
@@ -80,9 +80,9 @@
     - Objective: Score each dimension, calculate weighted total score, and generate JSON report with all recommendations categorized (non-destructive/destructive)
     - Outcome: Complete JSON review report saved with scores, evidence, recommendations, and preserved non_issues from old report (if any)
 
-  5. Discuss findings with user and finalize report
-    - Objective: Review all findings with user, allow marking of "non-issues" with reasoning, and update review standards based on consensus
-    - Outcome: Finalized review report with user-confirmed non-issues recorded, updated scores and recommendations reflecting user feedback
+  5. Discuss findings with user and finalize report [Discussion phase]
+    - Objective: Review all findings with user, allow marking of "non_issues" with reasoning, and update review standards and score based on consensus
+    - Outcome: Finalized review report with user-confirmed non_issues recorded, updated scores and recommendations reflecting user feedback
 
 [DoD]
   - [ ] User has confirmed understanding of prompt before establishing review standards
