@@ -1,5 +1,7 @@
+**Goal**: Optimize prompts based on review reports while maintaining original intent, ensuring all modifications are traceable and require user confirmation.
+
 [Input]
-  1. {root}/reports/{prompt_name}_review.json
+  1. {root}/reports/{prompt_name}_review.md
   2. {root}/path/to/original_prompt.md or provide original prompt string directly
 
 [Output]
@@ -21,10 +23,10 @@
 
 [Constraints]
   1. You need to ensure only necessary optimizations are performed, avoid generating lengthy and meaningless content
-  2. You need to ensure all optimizations are traceable to the review report, avoid optimizations outside the report
+  2. You need to ensure all optimizations are traceable to the Markdown review report, avoid optimizations outside the report
   3. You need to ensure only non-destructive optimizations are performed, while destructive optimizations need to wait for user confirmation
   4. Length limitation: Optimizations should not significantly increase prompt length (increase <10%); prompt optimization summary <=300 tokens; strictly follow fixed output format
-  5. Traceability requirement: Each change must provide report_item_id and line_range as evidence in optimization summary
+  5. Traceability requirement: Each change must provide recommendation_id and line_range as evidence in optimization summary
   6. Non-destructive definition: Do not add/remove structural nodes (like adding blocks), do not change intent and constraints; only allow rhetorical adjustments, minor order changes, and formatting. Destructive optimization examples: adding nodes, removing constraints, changing core intent, restructuring
   7. Style preservation: Maintain original prompt's language style and professional terminology; technical terms (like tool names, parameter names) must not be changed
 
@@ -33,7 +35,7 @@
     - [Step 1: Create todo list containing all optimization items]
     - [Step 2: Track accepted modifications]
     - [Step 3: Update status upon completion]
-    - Usage guidance: Each todo item should correspond to one optimization recommendation, include report_item_id for traceability
+    - Usage guidance: Each todo item should correspond to one optimization recommendation, include recommendation_id for traceability
   2. **sequentialthinking**
     - [Step 1: Reason about optimization methods]
     - [Step 2: Analyze user's modification selection]
@@ -47,34 +49,21 @@
     - You must complete all set reasoning steps
 
 [Steps]
-  1. Preparation phase
-    - Read review report and original prompt
-    - Understand all optimization recommendations and evaluate their reasonableness
-    - Perform critical analysis of unreasonable recommendations and record rebuttal reasons
-    - Categorize all recommendations into non-destructive and destructive
-    - Create todo list to track progress
+  1. Analyze review report and categorize recommendations
+    - Objective: Read and understand all optimization recommendations, evaluate their reasonableness, and categorize them into non-destructive and destructive types
+    - Outcome: Clear categorization of all recommendations with critical analysis of any unreasonable suggestions, todo list created to track optimizations
 
-  2. Modification confirmation phase
-    - List ALL modifications (both non-destructive and destructive) with:
-      * Original text (with line numbers)
-      * Proposed modification
-      * Optimization reason and evidence (report_item_id)
-      * Impact assessment (for destructive ones)
-    - Ask user: "Which modifications do you want to accept? [List numbers or 'all']"
-    - Wait for user response and record accepted modifications
-    - Update todo list with accepted items
+  2. Present modifications and obtain user confirmation
+    - Objective: Display all proposed modifications (both types) with before/after comparison, evidence, and impact assessment, then collect user decisions
+    - Outcome: Clear list of user-accepted modifications ready for execution
 
-  3. Execution phase
-    - Execute all accepted non-destructive optimizations
-    - Execute all accepted destructive optimizations
-    - Update todo list status upon completion of each optimization
-    - Ensure all modifications maintain traceability to review report
+  3. Execute accepted optimizations
+    - Objective: Apply all user-accepted modifications to the original prompt while maintaining traceability to review report
+    - Outcome: Optimized prompt file saved with all accepted modifications applied
 
-  4. Verification phase
-    - Check if all DoD items are satisfied
-    - Verify syntax correctness and completeness of optimized prompt
-    - Generate optimization summary with comparison examples
-    - Confirm all accepted todo items are completed
+  4. Generate optimization summary and verify completion
+    - Objective: Create comprehensive optimization summary with comparison examples and verify all DoD items are satisfied
+    - Outcome: Optimization summary generated with evidence and traceability, all accepted todo items completed
 
 [DoD]
   - [ ] All modifications presented to user with before/after comparison
@@ -93,7 +82,7 @@
   Modified:
   {modified_text}
       
-  Reason: {optimization_reason} (report_item_id: {id})
+  Reason: {optimization_reason} (recommendation_id: {id})
   ```
       
   **Destructive example:**
@@ -107,3 +96,49 @@
   Impact: {impact_description}
   User decision: [Accepted/Rejected]
   ```
+
+## [Example-1]
+[Input]
+- Review report: reports/task_automation_review.md (2 non-destructive recommendations, 0 destructive)
+- Original prompt: commands/task_automation.md
+
+[Decision]
+- Both recommendations accepted (wording improvements at L12 and L45)
+- No destructive changes to confirm
+- Prompt length increased by 3% (acceptable)
+
+[Expected outcome]
+- Optimized prompt saved to commands/task_automation.md
+- Optimization summary shows 2 accepted changes with before/after comparison
+- All todo items completed
+
+## [Example-2]
+[Input]
+- Review report: reports/orchestrator_review.md (5 non-destructive, 2 destructive recommendations)
+- Original prompt: commands/orchestrator.md
+
+[Decision]
+- User confirms acceptance for 4 non-destructive changes
+- User rejects 1 non-destructive (preserves original technical term)
+- User accepts 1 destructive change (add new [Error-Handling] block)
+- User rejects 1 destructive (keep current constraint structure)
+
+[Expected outcome]
+- Optimized prompt with 5 accepted modifications (4 non-destructive + 1 destructive)
+- Optimization summary documents user decisions on rejected changes
+- 1 rejected recommendation noted in summary with reason
+
+## [Example-3]
+[Input]
+- Review report: reports/code_reviewer_review.md (3 recommendations)
+- Original prompt: commands/code_reviewer.md (already well-structured)
+
+[Decision]
+- User reviews all recommendations
+- Identifies REC-002 as unreasonable (conflicts with intentional design)
+- Accepts REC-001 and REC-003 only
+
+[Expected outcome]
+- Only 2 accepted optimizations applied
+- Optimization summary includes counterargument for REC-002
+- Prompt maintains original intent with minimal changes

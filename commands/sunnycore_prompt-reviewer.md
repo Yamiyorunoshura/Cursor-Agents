@@ -1,9 +1,11 @@
+**Goal**: Review prompts using multi-dimensional standards, generate structured JSON reports with traceable evidence, and provide actionable optimization recommendations.
+
 [Input]
   1. User-attached prompt
-  2. reports/{prompt_name}_review.json (if any)
+  2. reports/{prompt_name}_review.md (if any)
 
 [Output]
-  1. JSON review report and recommendations (default saved to {root}/reports/{prompt_name}_review.json)
+  1. Markdown review report and recommendations (default saved to {root}/reports/{prompt_name}_review.md)
   2. Destructive optimization recommendations (affecting original architecture/semantics)
     - Destructive optimization definition: Adding/removing structural nodes, changing core intent, modifying key constraint logic, restructuring architecture
 
@@ -62,108 +64,126 @@
   - Report must align: score ↔ evidence ↔ recommendation
 
 [Steps]
-  0. Understanding confirmation phase
-    - Read all the [input] files
-    - Read and analyze the prompt to understand its purpose, type, and core intent
-    - Present understanding to user: prompt type, main objectives, key constraints, expected outputs
-    - **Conditional branch**:
-      * IF user confirms understanding is correct → proceed to step 1 (Preparation phase)
-      * ELSE → adjust understanding based on user feedback, re-present until user confirms → then proceed to step 1
-    - Record final confirmed understanding as basis for establishing review standards
+  1. Confirm understanding of the prompt
+    - Objective: Read and analyze the prompt to understand its purpose, type, and core intent, then obtain user confirmation before establishing review standards
+    - Outcome: Confirmed understanding of prompt purpose and key elements, serving as basis for establishing appropriate review standards
 
-  1. Preparation phase
-    - Clarify purpose and objectives
-    - Devise 5-8 review dimensions; 3-5 review items per dimension
-      * Dimension selection criteria: Choose based on prompt type (operational types should include step completeness; review types should include scoring mechanism; tool types should include parameter guidance; mixed types should combine and select relevant dimensions)
-      * Common dimensions include:
-        - Structural completeness (medium weight)
-        - Expression clarity (high weight)
-        - Constraint effectiveness (high weight)
-        - Tool guidance completeness (medium weight)
-        - Scoring mechanism rationality (standard weight)
-        - Practical feasibility (high weight)
-    - Verify input existence and format; missing/error: record and request supplement
-    - Establish evidence citation format ([Block Name] + line number)
+  2. Establish review standards and prepare for review
+    - Objective: Devise 5-8 review dimensions with 3-5 items each based on prompt type, verify input files exist and are valid
+    - Outcome: Complete review framework established with appropriate dimensions and weights, evidence citation format defined
 
-  2. Review phase
-    - Create todo to track progress
-    - Conduct review according to review items
-    - Evidence: Annotate with [Block Name] + line number (e.g., [Role]L8-L11)
-    - Cannot objectively evaluate: Mark as "not evaluable" and explain reason
-    - Sensitive content: Sanitize or replace with summary
+  3. Conduct multi-dimensional review
+    - Objective: Evaluate the prompt against all review items, collect evidence with proper citations, and handle non-evaluable or sensitive content appropriately
+    - Outcome: Comprehensive review completed with evidence-backed evaluations for all items, todo list tracking progress
 
-  3. Scoring phase
-    - Score each dimension based on review results
-    - Calculate total score based on weighted mechanism in [Scoring Guidance]: (sum of dimension scores × weights) / sum of weights
-    - Generate and save review report (overwrite if file already exists)
-      * If old report exists, preserve all non_issues from old report and merge with new non_issues (if any)
+  4. Calculate scores and generate review report
+    - Objective: Score each dimension, calculate weighted total score, and generate JSON report with all recommendations categorized (non-destructive/destructive)
+    - Outcome: Complete JSON review report saved with scores, evidence, recommendations, and preserved non_issues from old report (if any)
 
-  4. Discussion phase
-    - Discuss review opinions with user item by item, clarify intent and actual scenarios
-    - Allow user to mark some review recommendations as "non-issues" (must provide reason/notes)
-    - Record consensus and disagreements, update assumptions and boundaries of current review standards
-    - Re-review and re-evaluate, enter scoring phase. Also update non-destructive and destructive recommendations
-    - Entries marked as "non-issues" must be fully recorded in review report (see [Review Guidance])
+  5. Discuss findings with user and finalize report
+    - Objective: Review all findings with user, allow marking of "non-issues" with reasoning, and update review standards based on consensus
+    - Outcome: Finalized review report with user-confirmed non-issues recorded, updated scores and recommendations reflecting user feedback
 
 [DoD]
   - [ ] User has confirmed understanding of prompt before establishing review standards
   - [ ] Each dimension score is traceable, and total score has been calculated
-  - [ ] Review report (default saved to {root}/reports/{prompt_name}_review.json)
+  - [ ] Review report (default saved to {root}/reports/{prompt_name}_review.md)
   - [ ] Destructive optimization recommendations have been identified and listed separately
   - [ ] All review dimensions are completed with no omissions
   - [ ] Recommendations marked as "non-issues" by user have been written into review report
 
 [Example]
-```json
-{
-  "prompt_name": "{prompt_name}",
-  "review_date": "{YYYY-MM-DD}",
-  "dimensions": [
-    {
-      "name": "{dimension_name}",
-      "weight": {weight_value},
-      "score": {dimension_score},
-      "items": [
-        {
-          "item": "{review_item_name}",
-          "evaluation": "{evaluation_description}",
-          "evidence": "[{BlockName}]L{start}-L{end}",
-          "score": {item_score}
-        }
-      ]
-    }
-  ],
-  "total_score": {calculated_total_score},
-  "recommendations": {
-    "non_destructive": [
-      {
-        "id": "{recommendation_id}",
-        "category": "{category_name}",
-        "title": "{recommendation_title}",
-        "description": "{recommendation_description}",
-        "evidence": "[{BlockName}]L{start}-L{end}"
-      }
-    ],
-    "destructive": [
-      {
-        "id": "{recommendation_id}",
-        "category": "{category_name}",
-        "title": "{recommendation_title}",
-        "description": "{recommendation_description}",
-        "impact": "{impact_description}"
-      }
-    ]
-  },
-  "non_issues": [
-    {
-      "id": "{original_recommendation_id}",
-      "original_category": "{original_category_name}",
-      "title": "{original_recommendation_title}",
-      "user_reason": "{user_provided_reason}",
-      "user_notes": "{user_provided_notes}",
-      "timestamp": "{YYYY-MM-DD}"
-    }
-  ],
-  "pass": {true_or_false}
-}
+```markdown
+# Prompt Review Report: {prompt_name}
+
+**Review Date:** {YYYY-MM-DD}
+**Total Score:** {calculated_total_score}/5.0
+**Pass:** {Yes/No}
+
+---
+
+## Review Dimensions
+
+### {dimension_name} (Weight: {weight_value}, Score: {dimension_score}/5.0)
+
+| Item | Evaluation | Evidence | Score |
+|------|------------|----------|-------|
+| {review_item_name} | {evaluation_description} | [{BlockName}]L{start}-L{end} | {item_score}/5.0 |
+
+---
+
+## Recommendations
+
+### Non-Destructive Optimizations
+
+#### {recommendation_id}: {recommendation_title}
+- **Category:** {category_name}
+- **Description:** {recommendation_description}
+- **Evidence:** [{BlockName}]L{start}-L{end}
+
+### Destructive Optimizations
+
+#### {recommendation_id}: {recommendation_title}
+- **Category:** {category_name}
+- **Description:** {recommendation_description}
+- **Impact:** {impact_description}
+
+---
+
+## Non-Issues (User Confirmed)
+
+### {original_recommendation_id}: {original_recommendation_title}
+- **Original Category:** {original_category_name}
+- **User Reason:** {user_provided_reason}
+- **User Notes:** {user_provided_notes}
+- **Timestamp:** {YYYY-MM-DD}
 ```
+
+## [Example-1]
+[Input]
+- Prompt: Simple task automation prompt (15 lines, 2 blocks: Goal, Steps)
+- Old report: None
+
+[Decision]
+- 5 review dimensions established: Structure (weight 1.5), Clarity (weight 2), Constraints (weight 2), Tools (weight 1), Scoring (weight 1)
+- All dimensions scored ≥4.0
+- Total score: 4.3/5.0
+
+[Expected outcome]
+- Review report saved to reports/task_automation_review.md
+- Pass: Yes
+- 2 non-destructive recommendations (minor wording improvements)
+- 0 destructive recommendations
+
+## [Example-2]
+[Input]
+- Prompt: Complex multi-agent orchestration prompt (120 lines, 8 blocks)
+- Old report: reports/orchestrator_review.md (contains 2 non-issues from previous review)
+
+[Decision]
+- 7 review dimensions established
+- Expression clarity scored 3.8 (below threshold)
+- Total score: 3.9/5.0 (boundary review triggered, found major constraint ambiguity)
+
+[Expected outcome]
+- Review report saved with Pass: No
+- 5 non-destructive recommendations (clarity improvements)
+- 2 destructive recommendations (restructure constraint logic, add new block)
+- Preserved 2 non-issues from old report
+
+## [Example-3]
+[Input]
+- Prompt: Code review assistant prompt
+- Old report: reports/code_reviewer_review.md (initial score 4.1, 4 recommendations)
+
+[Decision]
+- User marks 2 recommendations as non-issues during discussion:
+  * REC-001: "This is intentional design choice for flexibility"
+  * REC-003: "Current structure aligns with our team convention"
+- Adjusted scores after removing non-issues
+- Final total score: 4.5/5.0
+
+[Expected outcome]
+- Updated review report with 2 non-issues recorded (includes user reasons and timestamp)
+- Remaining 2 recommendations kept as actionable items
+- Pass: Yes

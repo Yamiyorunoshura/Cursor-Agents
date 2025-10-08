@@ -1,4 +1,6 @@
- [Input]
+**Goal**: Initialize a new project with professional documentation structure (README.md, CHANGELOG.md, LICENSE, .gitignore), create GitHub remote repository, and optionally configure branch protection rules.
+
+[Input]
   None (User will provide information through interaction)
 
 [Output]
@@ -59,6 +61,16 @@
   10. Recommend executing in Unix-like environment (macOS/Linux) or Windows Git Bash, ensure generated files use LF line endings
   11. Command examples using `{variable_name}` are placeholders that must be replaced with actual values during execution
   12. Critical step failures (git commit) terminate execution; network failures (gh repo create) retain progress and prompt user; optional feature failures (branch protection) downgrade gracefully
+  13. Project name format validation: Maximum 3 retries; terminate and prompt user if still non-compliant
+  14. Git operations: Stage only actually created/overwritten files; skip files user chose not to overwrite
+  15. GitHub repository creation: Check network connectivity (gh api user) before proceeding
+  16. Branch protection configuration levels:
+    - Basic: Prevent force push and branch deletion
+    - Standard: Basic + require at least 1 PR reviewer approval
+    - Strict: Standard + require status checks + enforce rules for admins
+    - Custom: User-defined combination of protection rules
+  17. Initial commit message: "chore: initial commit"
+  18. Copyright holder for LICENSE: Use `git config user.name` as default, prompt user if empty
 
 [Tools]
   1. **todo_write**
@@ -67,176 +79,29 @@
     - [Step 5: Mark all tasks as completed during verification phase]
 
 [Steps]
-  0. Pre-check phase
-    - Check if current directory is a git repository
-        * Execute: git rev-parse --is-inside-work-tree
-        * If fails, execute: git init
-    - Check if key files already exist (README.md, CHANGELOG.md, LICENSE, .gitignore)
-        * If exists, ask user whether to overwrite; skip file creation if user declines
-    - Check if GitHub CLI is installed and authenticated
-        * Execute: gh --version
-        * Execute: gh auth status
-        * If fails, prompt user to install and authenticate gh CLI (provide installation guide link)
-    - Create todo list to track initialization progress
+  1. Verify environment and prepare for initialization
+    - Objective: Ensure git repository exists, GitHub CLI is installed and authenticated, and identify any existing files that may need overwriting
+    - Outcome: Environment ready for initialization, user informed of any file conflicts, todo list created to track progress
 
-  1. Information gathering phase
-    - Ask for project name (required)
-        * Format validation: Only letters, numbers, hyphens, underscores allowed
-        * Re-ask if format doesn't comply (maximum 3 retries; terminate and prompt user if still non-compliant)
-    - Ask for short project description (required, recommend 1-2 sentences)
-    - Ask for project type (for .gitignore generation)
-        * Provide options: Node.js, Python, Java, Go, Rust, React, Vue, Generic
-        * Suggest "Generic" if user is uncertain
-    - Ask for License type
-        * Provide options: MIT, Apache 2.0, GPL-3.0, BSD-3-Clause, Unlicense
-        * Provide brief description for each License
-        * Default: MIT
-    - Ask if branch protection rules need to be configured (optional)
-        * Provide options: Yes/No
-        * Default: No
-        * If "Yes", configure protection rules in subsequent steps
+  2. Gather project information
+    - Objective: Collect all necessary information about the project from user (name, description, type, license, branch protection preference)
+    - Outcome: Complete project configuration ready for file generation
 
-  2. File creation phase
-    2.1 Create README.md
-        - Content structure:
-            * # {Project Name}
-            * ## Project Introduction
-            * {Project Description}
-            * ## Installation
-            * (To be completed)
-            * ## Usage
-            * (To be completed)
-            * ## License
-            * {License Type}
-        - Execute creation if file exists and user chooses to overwrite; otherwise skip
-        
-    2.2 Create CHANGELOG.md
-        - Format follows Keep a Changelog v1.0.0
-        - Content structure:
-            * # Changelog
-            * Format description and version specification links
-            * ## [Unreleased]
-            * (To be completed with change records)
-        - Execute creation if file exists and user chooses to overwrite; otherwise skip
-        
-    2.3 Create .gitignore
-        - Generate corresponding template based on project type
-        - Generic template includes:
-            * OS files (.DS_Store, Thumbs.db)
-            * IDE files (.vscode/, .idea/, *.swp)
-            * Environment variable files (.env, .env.local)
-        - Execute creation if file exists and user chooses to overwrite; otherwise skip
-        
-    2.4 Create LICENSE
-        - Generate complete license text based on selected License type
-        - Automatically fill in current year
-        - Ask for copyright holder name
-            * First execute: git config user.name
-            * If returns empty, require user to input copyright holder name (no default)
-            * If returns value, use as default and allow user to modify
-        - Execute creation if file exists and user chooses to overwrite; otherwise skip
+  3. Create project documentation files
+    - Objective: Generate professional documentation files (README.md, CHANGELOG.md, LICENSE, .gitignore) based on user preferences
+    - Outcome: All selected documentation files created with appropriate content and format
 
-  3. Git operations phase
-    3.1 Stage all newly created files
-        - Dynamically compose git add command based on actually created files
-            * If file was created or overwritten, include in git add command
-            * If user skipped file creation (chose not to overwrite), exclude from git add command
-        - Execute: git add {list_of_created_files}
-        - Terminate and prompt user if fails
-        
-    3.2 Execute initial commit
-        - Execute: git commit -m "chore: initial commit"
-        - Terminate and prompt user if fails
-        
-    3.3 Gather GitHub repository information
-        - Ask for GitHub repository name (default: same as project name)
-        - Ask for repository visibility (public/private, default: public)
-        - Ask for repository description (default: same as project description)
-        - Check network connectivity before proceeding
-            * Execute: gh api user
-            * If fails, prompt user to check network connection and retry
-        
-    3.4 Create GitHub remote repository and push
-        - Execute based on user's visibility choice:
-            * If user chose "public": gh repo create {repo_name} --public --description "{description}" --source=. --remote=origin --push
-            * If user chose "private": gh repo create {repo_name} --private --description "{description}" --source=. --remote=origin --push
-        - If fails (e.g., repository name already exists), retain local commit and prompt user to check error message
-        
-    3.5 Verify remote repository link
-        - Execute: git remote -v
-        - Confirm origin is correctly configured
+  4. Initialize git repository and push to GitHub
+    - Objective: Stage created files, execute initial commit, create GitHub remote repository, and establish remote connection
+    - Outcome: Local repository initialized with initial commit, GitHub remote repository created and linked, changes pushed successfully
 
-  4. Branch protection rules configuration phase (if user chooses to configure)
-    4.1 Gather protection rule preferences
-        - Determine default branch name
-            * Execute: gh api repos/:owner/:repo --jq .default_branch
-            * Use returned value (typically "main" or "master") as default
-        - Check repository admin permissions
-            * Execute: gh api repos/:owner/:repo --jq .permissions.admin
-            * If returns false or fails, warn user that admin permissions are required and ask whether to continue
-        - Ask for branch name to protect
-            * Default: use the default branch name determined above
-        - Ask for protection rule level
-            * Basic protection: Prevent force push, prevent branch deletion
-            * Standard protection: Basic protection + require Pull Request review (at least 1 reviewer)
-            * Strict protection: Standard protection + require status checks to pass + require reviewer approval before merge
-            * Custom protection: Let user choose specific rules
-            * Default: Standard protection
-        
-    4.2 Configure specific protection rule options (if "Custom protection" is chosen)
-        - Require Pull Request review? (Yes/No, default: Yes)
-            * If yes, how many reviewers required for approval? (1-6, default: 1)
-            * Allow code owners to automatically become reviewers? (Yes/No, default: Yes)
-        - Require status checks to pass? (Yes/No, default: No)
-            * If yes, require branch to be up to date before merge? (Yes/No, default: Yes)
-        - Prevent force push? (Yes/No, default: Yes)
-        - Prevent branch deletion? (Yes/No, default: Yes)
-        - Require linear history? (Yes/No, default: No)
-        - Restrict who can push? (Yes/No, default: No)
-            * If yes, ask for list of allowed users/teams to push
-    
-    4.3 Execute branch protection rule configuration
-        - Configure branch protection using gh CLI with JSON body format based on selected protection level or custom rules
-        - Basic protection execution:
-            * echo '{"required_pull_request_reviews":null,"required_status_checks":null,"enforce_admins":false,"restrictions":null,"allow_force_pushes":{"enabled":false},"allow_deletions":{"enabled":false}}' | gh api repos/:owner/:repo/branches/{branch}/protection -X PUT --input -
-        - Standard protection execution:
-            * echo '{"required_pull_request_reviews":{"required_approving_review_count":1},"required_status_checks":null,"enforce_admins":false,"restrictions":null,"allow_force_pushes":{"enabled":false},"allow_deletions":{"enabled":false}}' | gh api repos/:owner/:repo/branches/{branch}/protection -X PUT --input -
-        - Strict protection execution:
-            * echo '{"required_pull_request_reviews":{"required_approving_review_count":1,"dismiss_stale_reviews":true},"required_status_checks":{"strict":true,"contexts":[]},"enforce_admins":true,"restrictions":null,"allow_force_pushes":{"enabled":false},"allow_deletions":{"enabled":false}}' | gh api repos/:owner/:repo/branches/{branch}/protection -X PUT --input -
-        - Custom protection execution:
-            * Construct JSON body based on user-selected options and execute using --input - format
-        - If fails, prompt user to check permissions or manually configure in GitHub web interface
-    
-    4.4 Verify protection rule configuration
-        - Execute: gh api repos/:owner/:repo/branches/{branch}/protection
-        - Parse JSON response to verify rules are correctly applied:
-            * Check required_pull_request_reviews.required_approving_review_count matches expected value
-            * Check enforce_admins status
-            * Check allow_force_pushes.enabled and allow_deletions.enabled are false
-            * Verify required_status_checks configuration if applicable
-        - Output summary of configured protection rules in table format:
-            * Protection level applied
-            * Required reviewers count (if applicable)
-            * Enforce admins status
-            * Force push prevention status
-            * Branch deletion prevention status
+  5. Configure branch protection rules (if requested)
+    - Objective: Set up branch protection rules based on user's selected protection level (Basic/Standard/Strict/Custom)
+    - Outcome: Branch protection rules configured and verified on GitHub repository
 
-  5. Verification phase
-    - Check if all files that should be created exist
-        * README.md, CHANGELOG.md, .gitignore, LICENSE
-    - Check git commit history
-        * Execute: git log --oneline -1
-        * Confirm initial commit exists
-    - Check remote repository link
-        * Execute: git remote -v
-        * Confirm origin points to correct GitHub repository
-    - Output initialization completion summary:
-        * ✓ List of created files
-        * ✓ Git repository status
-        * ✓ GitHub repository URL
-        * ✓ Branch protection rules status (if configured)
-        * ✓ Next steps suggestions (e.g., start writing code, configure CI/CD)
-    - Confirm all todo items are completed
+  6. Verify initialization completion
+    - Objective: Confirm all files exist, git history is correct, remote connection is established, and protection rules are applied (if configured)
+    - Outcome: Complete initialization summary presented to user with next steps suggestions
 
 [DoD]
   - [ ] README.md has been created (includes project name and description)
@@ -250,5 +115,71 @@
   - [ ] Branch protection rules have been configured (optional, only if user chose to configure)
   - [ ] All todo items have been completed
   - [ ] Initialization completion summary has been output
+
+## [Example-1]
+[Input]
+- User information collected via interaction:
+  * Project name: my-web-app
+  * Description: A modern web application
+  * Type: Node.js
+  * License: MIT
+  * Repository visibility: public
+  * Branch protection: No
+
+[Decision]
+- Create all 4 files (README.md, CHANGELOG.md, .gitignore, LICENSE)
+- .gitignore includes Node.js template (node_modules/, dist/, .env, etc.)
+- LICENSE uses MIT text with git user.name as copyright holder
+- GitHub CLI available and authenticated
+- Skip branch protection configuration
+
+[Expected outcome]
+- All files created successfully
+- Git initialized with initial commit: "chore: initial commit"
+- GitHub repo created: https://github.com/{user}/my-web-app
+- Remote linked and pushed
+- Summary output with next steps
+
+## [Example-2]
+[Input]
+- Project name: data-pipeline
+- Description: Python-based data processing pipeline
+- Type: Python
+- License: Apache-2.0
+- Repository visibility: private
+- Branch protection: Standard protection
+
+[Decision]
+- Create all 4 files with Python-specific .gitignore (__pycache__/, *.pyc, venv/, etc.)
+- LICENSE uses Apache 2.0 license text
+- GitHub repo created as private
+- Configure branch protection: prevent force push + require 1 PR approval
+
+[Expected outcome]
+- All files created with Python project structure
+- Private GitHub repository created
+- Branch protection rules applied to main branch
+- Verification shows protection rules active
+- Initialization complete with summary
+
+## [Example-3]
+[Input]
+- Existing files detected: README.md, LICENSE already exist
+- Project name: legacy-project
+- Type: Generic
+- License: BSD-3-Clause
+
+[Decision]
+- User prompted: Overwrite README.md? → No
+- User prompted: Overwrite LICENSE? → Yes
+- Create CHANGELOG.md and .gitignore (new files)
+- GitHub CLI check: Not authenticated → prompt user with installation guide
+
+[Expected outcome]
+- README.md preserved (not overwritten)
+- LICENSE overwritten with BSD-3-Clause
+- CHANGELOG.md and .gitignore created
+- Git operations paused, user guided to authenticate gh CLI
+- Partial initialization saved, ready to resume after authentication
 
 

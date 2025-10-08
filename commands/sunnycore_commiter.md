@@ -1,3 +1,5 @@
+**Goal**: Analyze staged changes, generate compliant commit messages, update project documentation (CHANGELOG.md, README.md), and safely commit and push to the appropriate branch while preventing sensitive information exposure.
+
 [Input]
   1. git diff --staged (changes staged to index)
      - For long diffs, use one of the following strategies to avoid truncation:
@@ -61,7 +63,18 @@
         * Replace with placeholders: [API_KEY], [PASSWORD], [EMAIL]
         * Environment variable hints: Suggest using ${ENV_VAR_NAME} instead of hardcoding
     - If sensitive information is detected, pause the process and prompt user to confirm sanitization
-  5. Exception handling principles: All validation failures maximum 3 retries, retry mechanism re-executes from Step 1; git operation failures preserve scene and prompt user to check status; sensitive information detection failures pause process awaiting user confirmation; branch creation or merge operation failures preserve state and explain specific reason
+  5. Exception handling principles: All validation failures maximum 3 retries, retry mechanism re-executes from analysis phase; git operation failures preserve scene and prompt user to check status; sensitive information detection failures pause process awaiting user confirmation; branch creation or merge operation failures preserve state and explain specific reason
+  6. Main branch commit strategy: Must use isolated branch (format: {project-name}/v{version}), then merge back to main with --no-ff
+    - Version extraction: Parse from *.lock file in project root using regex pattern: ([\w-]+)\s*=\s*([0-9]+\.[0-9]+\.[0-9]+)
+    - Branch naming: {project-name}/v{version} (e.g., cursor-agents/v1.7.14)
+    - Merge requirement: Check remote updates before merge; abort on conflicts
+    - Cleanup: Delete local branch after successful merge and push
+  7. Non-main branch commit strategy: Commit directly on current branch and push
+  8. Diff retrieval strategy (priority order):
+    - Strategy 1 (Temporary file): git diff --staged > /tmp/staged_diff.txt then read file
+    - Strategy 2 (Segmented): git diff --staged --stat + git diff --staged -- <file_path> per file
+    - Must clean up temporary files after use
+  9. Must verify current directory is git project root (has .git folder) before operations
 
 [Tools]
   1. **todo_write**
@@ -69,106 +82,25 @@
     - [All steps except Step 0: Track task progress]
 
 [Steps]
-  0. Pre-check phase
-    - Get staged diff using anti-truncation strategy:
-        * Priority: Try Strategy 1 (Temporary file) first for best reliability
-        * Execution steps for Strategy 1:
-          1. Execute: git diff --staged > /tmp/staged_diff.txt
-          2. Use read_file to read /tmp/staged_diff.txt
-          3. Store diff content for subsequent analysis
-        * Fallback: If Strategy 1 fails, try Strategy 3 (Segmented approach):
-          1. Execute: git diff --staged --stat to get file list and change summary
-          2. Execute: git diff --staged -- <file_path> for each important file
-          3. Combine results for analysis
-    - Verify diff is non-empty and parseable
-    - If diff is empty or abnormal, terminate and prompt user
-    - Check if CHANGELOG.md and README.md exist, create initial files if not
-    - Check if diff contains sensitive information, flag for sanitization if present
-    - Clean up temporary files after use (delete /tmp/staged_diff.txt if created)
+  1. Verify staged changes and environment readiness
+    - Objective: Ensure staged diff is valid, parseable, and free of sensitive information
+    - Outcome: Valid diff content ready for analysis, project environment verified
 
-  1. Analysis phase
-    - Analyze diff to understand the impact of changes on the project
-    - Identify affected functional modules and file scope
-    - Determine if README.md needs updating based on:
-        * Major feature changes (see Definition 1)
-        * Version update rules (see Definition 4):
-            - Parse version number from *.lock file (if exists)
-            - Compare with previous version to determine update type (major/minor/patch)
-            - Apply corresponding README.md update rules
-    - Create todo items based on actual tasks
+  2. Analyze changes and determine documentation updates
+    - Objective: Understand the impact of changes on the project and identify which documentation needs updating
+    - Outcome: Clear understanding of change scope, commit type determined, README.md update decision made based on version change type and feature impact
 
-  2. File update phase
-    - Update CHANGELOG.md based on changes (compliant with Keep a Changelog format)
-    - Update README.md if there are major changes affecting project functionality
-    - Stage CHANGELOG.md and README.md changes
+  3. Update project documentation
+    - Objective: Synchronize CHANGELOG.md and README.md (if needed) with the actual changes
+    - Outcome: Documentation files updated and staged, ready for commit
 
-  3. Validation phase
-    - Check if commit message complies with Conventional Commits format
-    - Check if CHANGELOG.md entries are complete and properly formatted
-    - Check if README.md updates are appropriate (if updated)
-    - Verify all output content has no sensitive information exposure
-    - If validation fails, regenerate or prompt user for correction, maximum 3 retries
-        * Retry mechanism: Re-execute from Step 1, retain detected sensitive information flags and file check results
-        * Retry conditions: Format validation failure, content consistency check failure, security check failure
-        * If still failing after 3 retries, terminate and retain draft, prompt specific failure reason
+  4. Generate and validate commit message
+    - Objective: Create a commit message that complies with Conventional Commits format and accurately describes the changes
+    - Outcome: Validated commit message with no sensitive information exposure
 
-  4. Writing and commit phase
-    - Write commit message (compliant with Conventional Commits format)
-        
-    4.0 Pre-commit check
-        - Check current directory is git project root (exists .git folder), otherwise terminate and prompt correct execution location
-        
-    4.1 Check current branch
-        - Execute: git branch --show-current
-        - Get current branch name for subsequent judgment
-        
-    4.2 Determine branch type
-        - Judgment: If on main branch (main/master) go to 4.3 (main branch flow)
-        - Otherwise go to 4.4 (non-main branch flow)
-        
-    4.3 Main branch flow (requires isolated branch)
-        4.3.1 Automatically identify version file and read version number
-            - Use glob_file_search to find "*.lock" files in project root directory
-            - If multiple .lock files found, select first one (or select in alphabetical order)
-            - If no .lock file found, terminate process and prompt user: "No version file (*.lock) found, please confirm project root directory or manually specify version number"
-            - Extract project name from filename: remove .lock extension as project name (e.g., cursor-agents.lock → cursor-agents)
-            - Use read_file to read the .lock file content
-            - Use regex to parse version number: match "version number after =" pattern (e.g., sunnycore = 1.7.14 → 1.7.14)
-                * Regex pattern: ([\w-]+)\s*=\s*([0-9]+\.[0-9]+\.[0-9]+)
-            - If parsing fails, terminate process and prompt user: "Unable to parse version number, please check file format or manually specify version number"
-            - Branch naming rule: {project-name}/v{version} (e.g., cursor-agents/v1.7.14)
-            - Check if branch exists: git branch --list {branch_name}
-            - Switch to branch if exists: git checkout {branch_name}
-            - Create new branch if not exists: git checkout -b {branch_name}
-            - If branch creation fails (e.g. naming conflict, permission issue), terminate process and prompt user to check git status
-            
-        4.3.2 Execute commit on new branch
-            - Execute: git commit -m "{commit_message}"
-            - Terminate and prompt user if fails
-            
-        4.3.3 Switch back to main branch and check remote updates
-            - Execute: git checkout main && git fetch origin
-            - Execute: git rev-list HEAD..origin/main --count to check for remote updates, if output > 0 indicates updates exist, terminate process and prompt user to execute git pull first then re-execute
-            
-        4.3.4 Execute merge
-            - Execute: git merge {branch_name} --no-ff
-            - If conflicts occur, execute git merge --abort and prompt user: "Merge conflict detected, merge cancelled, please manually resolve conflicts and re-execute"
-            
-        4.3.5 Push to remote
-            - Execute: git push origin main
-            - If fails (e.g., remote rejects), retain local commit and prompt user to check permissions or remote status
-            
-        4.3.6 Clean up branch (optional)
-            - If successfully merged and pushed, delete local branch: git branch -d {branch_name}
-        
-    4.4 Non-main branch flow (operate directly on current branch)
-        4.4.1 Execute commit on current branch
-            - Execute: git commit -m "{commit_message}"
-            - Terminate and prompt user if fails
-            
-        4.4.2 Push current branch to remote
-            - Execute: git push origin {current_branch_name}
-            - If fails (e.g., remote rejects), retain local commit and prompt user to check permissions or remote status
+  5. Execute commit and push to appropriate branch
+    - Objective: Safely commit changes to the correct branch and push to remote repository
+    - Outcome: Changes committed on isolated branch (if main branch) or current branch (if feature branch), merged to main (if applicable), and pushed successfully to remote
 
 [DoD]
   - [ ] Commit message has been written and complies with Conventional Commits format
@@ -179,3 +111,61 @@
   - [ ] Git operations have been successfully executed (commit, branch, merge, push)
   - [ ] If on main branch, successfully created isolated branch and completed merge and push
   - [ ] Temporary files have been cleaned up (e.g., /tmp/staged_diff.txt)
+
+## [Example-1]
+[Input]
+- Current branch: feature/user-auth
+- Staged changes: Added login form component, updated API endpoint
+- Lock file: Not present (feature branch)
+
+[Decision]
+- Commit type: feat
+- Scope: auth
+- No README.md update needed (feature branch, not major change)
+- CHANGELOG.md: Added entry under "Unreleased" section
+- Direct commit on feature branch (no isolated branch needed)
+
+[Expected outcome]
+- Commit message: "feat(auth): add user login form and API integration"
+- CHANGELOG.md updated with new feature entry
+- Committed and pushed to feature/user-auth
+- No sensitive information detected
+
+## [Example-2]
+[Input]
+- Current branch: main
+- Staged changes: Fixed null pointer exception in data processor
+- Lock file: cursor-agents = 1.2.3
+
+[Decision]
+- Commit type: fix
+- Version bump: 1.2.3 → 1.2.4 (patch)
+- No README.md update needed (patch version, no usage pattern change)
+- CHANGELOG.md: Added fix entry under v1.2.4
+- Create isolated branch: cursor-agents/v1.2.4
+
+[Expected outcome]
+- Isolated branch created: cursor-agents/v1.2.4
+- Commit message: "fix: resolve null pointer in data processor"
+- Merged to main with --no-ff
+- Pushed to remote, local branch deleted
+
+## [Example-3]
+[Input]
+- Current branch: main
+- Staged changes: Updated documentation formatting in multiple files
+- Lock file: project = 2.1.0
+
+[Decision]
+- Commit type: docs
+- Version: No change (documentation only)
+- README.md: Not updated (no feature changes)
+- CHANGELOG.md: Added docs entry under v2.1.0
+- Sensitive info check: Detected email in commit example → sanitized to [EMAIL]
+
+[Expected outcome]
+- User prompted to confirm sanitization
+- Commit message: "docs: improve formatting and examples"
+- CHANGELOG.md updated with sanitized content
+- Direct commit on main branch (docs-only change)
+- Pushed successfully
