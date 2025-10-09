@@ -7,6 +7,20 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [1.2.0] - 2025-10-09
+
+### Added
+- 新增 Prompt Reviewer Agent 上下文連貫性檢查功能 (Context-Coherence-Guidance)
+- 新增角色定位檢查能力，驗證目標對象是否明確針對 LLM 而非用戶
+- 新增內容連貫性分析，確保各區塊內容與定義目的一致
+- 新增相關性檢查，識別與主要目的無關的內容
+- 新增誤導性表達檢測，避免 LLM 誤解或混淆
+
+### Changed
+- 更新 Prompt Reviewer Agent 評分權重機制，將「上下文連貫性」列為高權重維度 (weight ×2)
+- 改進 Prompt Reviewer Agent 破壞性優化定義，明確上下文問題的分類標準
+- 更新範例以展示上下文連貫性檢查的實際應用
+
 ## [1.1.0] - 2025-10-08
 
 ### Improved
