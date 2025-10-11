@@ -7,6 +7,23 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [1.3.0] - 2025-10-11
+
+### Added
+- 新增 Commiter Agent 多種專案版本文件格式支援（Cargo.toml、package.json、pyproject.toml、go.mod、*.lock）
+- 新增版本文件自動檢測邏輯，依優先順序掃描並使用第一個檢測到的版本文件
+- 新增專案名稱提取邏輯，支援從 Cargo.toml、package.json、*.lock 檔名或目錄名稱提取
+- 新增版本文件一致性更新機制，確保所有檢測到的版本文件同步更新
+
+### Changed
+- 更新 Commiter Agent 版本提取策略，從單一 *.lock 文件擴展為多格式支援
+- 更新 DoD 檢查清單，新增「所有檢測到的版本文件已一致更新」驗證項
+- 改進步驟 3 說明，從「更新 *.lock 文件」改為「更新所有檢測到的版本文件」
+- 更新範例說明，將「Lock file」改為「Version file」以反映新的多格式支援
+
+### Fixed
+- 修復 Prompt Reviewer Agent 步驟 4 說明文字（移除「JSON」字樣）
+
 ## [1.2.0] - 2025-10-09
 
 ### Added

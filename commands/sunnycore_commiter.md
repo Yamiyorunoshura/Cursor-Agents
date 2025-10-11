@@ -7,7 +7,7 @@
        * Strategy 2 (No pager): git diff --staged --no-pager
        * Strategy 3 (Segmented): First use git diff --staged --stat to get summary, then git diff --staged -- <specific_files> for important files
        * Strategy 4 (Combined): Use git diff --staged --stat for overview + git diff --staged --unified=3 for context
-  2. *.lock file (version number)
+  2. Version files (detected automatically based on project type)
 
 [Output]
   1. Commit message compliant with modern project management
@@ -45,6 +45,36 @@
     | Major (X.0.0) | 1.0.0 → 2.0.0 | **MUST update** | Always update for breaking changes |
     | Minor (1.X.0) | 1.1.0 → 1.2.0 | **Conditional update** | Update if README doesn't describe existing features OR new features added |
     | Patch (1.1.X) | 1.1.0 → 1.1.1 | **No update needed** | Unless it affects user usage patterns |
+    
+  5. **Version file detection and update strategy** (Priority order)
+    - **Cargo.toml** (Rust):
+        * Detection: File exists in project root
+        * Location: `[package]` section
+        * Pattern: `version = "x.y.z"`
+        * Regex: `(version\s*=\s*)"([0-9]+\.[0-9]+\.[0-9]+)"`
+    - **package.json** (Node.js):
+        * Detection: File exists in project root
+        * Location: Root level JSON object
+        * Pattern: `"version": "x.y.z"`
+        * Regex: `("version"\s*:\s*)"([0-9]+\.[0-9]+\.[0-9]+)"`
+    - **pyproject.toml** (Python):
+        * Detection: File exists in project root
+        * Location: `[project]` or `[tool.poetry]` section
+        * Pattern: `version = "x.y.z"`
+        * Regex: `(version\s*=\s*)"([0-9]+\.[0-9]+\.[0-9]+)"`
+    - **go.mod** (Go):
+        * Detection: File exists in project root
+        * Note: Go uses git tags for versioning, file content doesn't contain version
+        * Action: Skip file modification, version only used for branch naming
+    - ***.lock** (Custom format):
+        * Detection: Any .lock file in project root
+        * Pattern: `project-name = x.y.z`
+        * Regex: `([\w-]+\s*=\s*)([0-9]+\.[0-9]+\.[0-9]+)`
+    - **Version extraction logic**:
+        * Scan project root for version files in priority order
+        * Use first detected file as primary version source
+        * Extract project name from: Cargo.toml (package.name) > package.json (name) > *.lock filename > directory name
+        * Update all detected version files to maintain consistency
 
 [Skills]
   1. **Deep understanding capability**: Effectively understand the impact of changes on the project
@@ -66,7 +96,8 @@
     - If sensitive information is detected, pause the process and prompt user to confirm sanitization
   5. Exception handling principles: All validation failures maximum 3 retries, retry mechanism re-executes from analysis phase; git operation failures preserve scene and prompt user to check status; sensitive information detection failures pause process awaiting user confirmation; branch creation or merge operation failures preserve state and explain specific reason
   6. Main branch commit strategy: Must use isolated branch (format: {project-name}/v{version}), then merge back to main with --no-ff
-    - Version extraction: Parse from *.lock file in project root using regex pattern: ([\w-]+)\s*=\s*([0-9]+\.[0-9]+\.[0-9]+)
+    - Version extraction: Parse from primary version file (Cargo.toml/package.json/pyproject.toml > *.lock) using corresponding regex pattern
+    - Project name extraction: From Cargo.toml (package.name)/package.json (name) > *.lock filename > directory name
     - Branch naming: {project-name}/v{version} (e.g., cursor-agents/v1.7.14)
     - Merge requirement: Check remote updates before merge; if conflicts detected:
         * Abort merge operation (git merge --abort)
@@ -95,9 +126,9 @@
     - Objective: Understand the impact of changes on the project and identify which documentation needs updating
     - Outcome: Clear understanding of change scope, commit type determined, README.md update decision made based on version change type and feature impact
 
-  3. Update project documentation
-    - Objective: Synchronize version number in *.lock file, CHANGELOG.md, and README.md (if needed) with the actual changes
-    - Outcome: Version number updated in *.lock file, documentation files updated and staged, ready for commit
+  3. Update project documentation and version files
+    - Objective: Synchronize version numbers across all project files (Cargo.toml, package.json, pyproject.toml, *.lock, etc.) and update documentation (CHANGELOG.md, README.md) to reflect the actual changes
+    - Outcome: All version files updated with new version number, documentation files synchronized and staged, ready for commit
 
   4. Generate and validate commit message
     - Objective: Create a commit message that complies with Conventional Commits format and accurately describes the changes
@@ -111,6 +142,7 @@
   - [ ] Commit message has been written and complies with Conventional Commits format
   - [ ] CHANGELOG.md has been updated and complies with Keep a Changelog format
   - [ ] README.md has been updated (if there are major feature changes)
+  - [ ] All detected version files have been updated consistently (Cargo.toml, package.json, pyproject.toml, *.lock, etc.)
   - [ ] All output content has no sensitive information exposure (API keys, passwords, PII, etc.)
   - [ ] All validation items have passed (format check, content consistency, security check)
   - [ ] Git operations have been successfully executed (commit, branch, merge, push)
@@ -121,11 +153,12 @@
 [Input]
 - Current branch: feature/user-auth
 - Staged changes: Added login form component, updated API endpoint
-- Lock file: Not present (feature branch)
+- Version file: package.json with version "1.5.2"
 
 [Decision]
 - Commit type: feat
 - Scope: auth
+- No version bump (feature branch)
 - No README.md update needed (feature branch, not major change)
 - CHANGELOG.md: Added entry under "Unreleased" section
 - Direct commit on feature branch (no isolated branch needed)
@@ -140,7 +173,7 @@
 [Input]
 - Current branch: main
 - Staged changes: Fixed null pointer exception in data processor
-- Lock file: cursor-agents = 1.2.3
+- Version file: Cargo.toml with version "1.2.3"
 
 [Decision]
 - Commit type: fix
@@ -151,6 +184,7 @@
 
 [Expected outcome]
 - Isolated branch created: cursor-agents/v1.2.4
+- Cargo.toml version updated to "1.2.4"
 - Commit message: "fix: resolve null pointer in data processor"
 - Merged to main with --no-ff
 - Pushed to remote, local branch deleted
@@ -159,7 +193,7 @@
 [Input]
 - Current branch: main
 - Staged changes: Updated documentation formatting in multiple files
-- Lock file: project = 2.1.0
+- Version file: project.lock with version "2.1.0"
 
 [Decision]
 - Commit type: docs
@@ -174,3 +208,29 @@
 - CHANGELOG.md updated with sanitized content
 - Direct commit on main branch (docs-only change)
 - Pushed successfully
+
+## [Example-4]
+[Input]
+- Current branch: main
+- Staged changes: Added new authentication middleware with breaking API changes
+- Version files detected: 
+  * Cargo.toml with version "1.8.3" (primary)
+  * cursor-agents.lock with version "1.8.3"
+
+[Decision]
+- Commit type: feat
+- Scope: auth
+- Version bump: 1.8.3 → 2.0.0 (major - breaking change)
+- README.md: MUST update (breaking changes in API)
+- CHANGELOG.md: Added breaking change entry under v2.0.0
+- Create isolated branch: cursor-agents/v2.0.0
+
+[Expected outcome]
+- Isolated branch created: cursor-agents/v2.0.0
+- Cargo.toml version updated to "2.0.0"
+- cursor-agents.lock version updated to "2.0.0"
+- README.md updated with new authentication flow
+- CHANGELOG.md includes breaking change notice
+- Commit message: "feat(auth)!: add new middleware with breaking API changes"
+- Merged to main with --no-ff
+- Pushed to remote, local branch deleted

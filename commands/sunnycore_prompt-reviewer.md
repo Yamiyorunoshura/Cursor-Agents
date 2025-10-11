@@ -87,7 +87,7 @@
     - Outcome: Comprehensive review completed with evidence-backed evaluations for all items, todo list tracking progress
 
   4. Calculate scores and generate review report
-    - Objective: Score each dimension, calculate weighted total score, and generate JSON report with all recommendations categorized (non-destructive/destructive)
+    - Objective: Score each dimension, calculate weighted total score, and generate report with all recommendations categorized (non-destructive/destructive)
     - Outcome: Complete JSON review report saved with scores, evidence, recommendations, and preserved non_issues from old report (if any)
 
   5. Discuss findings with user and finalize report [Discussion phase]
