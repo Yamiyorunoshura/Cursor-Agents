@@ -75,10 +75,22 @@
         * Use first detected file as primary version source
         * Extract project name from: Cargo.toml (package.name) > package.json (name) > *.lock filename > directory name
         * Update all detected version files to maintain consistency
+    
+  6. **Change significance analysis principles**
+    - **Project nature understanding**: Read and comprehend README.md to understand the project's core purpose and type
+    - **Change impact assessment**:
+        * Content semantic analysis: Compare before/after changes to determine if core behavior/functionality/instructions have changed
+        * README correlation: Check if the changed functionality/behavior is described in README or should be described
+        * User impact: Determine if changes affect user experience or development workflow
+    - **Filtering criteria**:
+        * External file updates unrelated to project core functionality
+        * Formatting adjustments that don't affect project usage or behavior
+        * Refer to examples to understand what constitutes "meaningful changes" in different project types
 
 [Skills]
   1. **Deep understanding capability**: Effectively understand the impact of changes on the project
   2. **Summarization capability**: Able to summarize large amounts of changes into concise commit messages
+  3. **Semantic analysis capability**: Able to determine the actual impact of documentation/prompt changes on AI behavior, distinguish between wording improvements and functional changes
 
 [Constraints]
   1. Commit messages must comply with Conventional Commits format (type(scope): subject), subject line ≤72 characters, body lines ≤100 characters
@@ -123,8 +135,15 @@
     - Outcome: Valid diff content ready for analysis, project environment verified
 
   2. Analyze changes and determine documentation updates
-    - Objective: Understand the impact of changes on the project and identify which documentation needs updating
-    - Outcome: Clear understanding of change scope, commit type determined, README.md update decision made based on version change type and feature impact
+    - Objective: Understand project nature, filter meaningful changes, assess impact, and identify which documentation needs updating
+    - Process:
+        * Read README.md to understand project type and core purpose
+        * Perform semantic analysis on each changed file to determine significance
+        * Filter out meaningless changes (external workflows, unrelated updates)
+        * If all changes are meaningless, abort process and notify user
+        * For meaningful changes, determine commit type (e.g., in AI/prompt projects, prompt changes that alter AI behavior = feat)
+        * Decide README update strategy based on change impact
+    - Outcome: Clear understanding of change scope with filtered meaningful changes, commit type determined, README.md update decision made based on project type and actual impact
 
   3. Update project documentation and version files
     - Objective: Synchronize version numbers across all project files (Cargo.toml, package.json, pyproject.toml, *.lock, etc.) and update documentation (CHANGELOG.md, README.md) to reflect the actual changes
@@ -192,22 +211,35 @@
 ## [Example-3]
 [Input]
 - Current branch: main
-- Staged changes: Updated documentation formatting in multiple files
-- Version file: project.lock with version "2.1.0"
+- Staged changes: Modified commands/sunnycore_commiter.md, added new validation steps
+- Version file: cursor-agents.lock with version "1.5.0"
+- Project type: AI/prompt engineering project (detected from README containing "AI agents", "cursor agents")
+
+[Analysis]
+- README analysis: Project is an AI agent command system
+- Semantic analysis of changes:
+    * Added requirement for AI to validate commit message length
+    * Added new step for checking CHANGELOG format compliance
+    * Changed AI behavior: Now performs additional validation → Functional change
+- Impact assessment: Changes alter AI execution flow and output quality
+- Conclusion: Prompt changes that modify AI behavior = feature addition
 
 [Decision]
-- Commit type: docs
-- Version: No change (documentation only)
-- README.md: Not updated (no feature changes)
-- CHANGELOG.md: Added docs entry under v2.1.0
-- Sensitive info check: Detected email in commit example → sanitized to [EMAIL]
+- Commit type: feat (not docs - changes AI behavior)
+- Scope: prompt
+- Version bump: 1.5.0 → 1.6.0 (minor - new validation features)
+- README.md: MUST update (new validation capabilities should be documented)
+- CHANGELOG.md: Added feature entry under v1.6.0
+- Create isolated branch: cursor-agents/v1.6.0
 
 [Expected outcome]
-- User prompted to confirm sanitization
-- Commit message: "docs: improve formatting and examples"
-- CHANGELOG.md updated with sanitized content
-- Direct commit on main branch (docs-only change)
-- Pushed successfully
+- Isolated branch created: cursor-agents/v1.6.0
+- cursor-agents.lock version updated to "1.6.0"
+- README.md updated with new validation features
+- Commit message: "feat(prompt): add commit message and CHANGELOG validation"
+- CHANGELOG.md includes new validation features
+- Merged to main with --no-ff
+- Pushed to remote, local branch deleted
 
 ## [Example-4]
 [Input]
@@ -234,3 +266,39 @@
 - Commit message: "feat(auth)!: add new middleware with breaking API changes"
 - Merged to main with --no-ff
 - Pushed to remote, local branch deleted
+
+## [Example-5]
+[Input]
+- Current branch: main
+- Staged changes: 
+  * src/core/processor.rs: Fixed memory leak in data processing loop
+  * .github/workflows/external_sync.yml: Updated third-party workflow sync schedule
+  * docs/internal_notes.txt: Added meeting notes (not in .gitignore)
+- Version file: Cargo.toml with version "2.3.5"
+
+[Analysis]
+- README analysis: Project is a data processing library
+- File-by-file semantic analysis:
+    * processor.rs: Core functionality fix → Meaningful (affects users)
+    * external_sync.yml: External workflow unrelated to project functionality → Meaningless
+    * internal_notes.txt: Internal documentation not related to project usage → Meaningless
+- README correlation: Memory leak fix should be documented in CHANGELOG
+- Filtering result: Keep only processor.rs changes
+
+[Decision]
+- Commit type: fix
+- Scope: core
+- Version bump: 2.3.5 → 2.3.6 (patch)
+- README.md: No update needed (patch fix, no usage change)
+- CHANGELOG.md: Added fix entry under v2.3.6 (only mention processor.rs)
+- Create isolated branch: data-processor/v2.3.6
+- Note: Filtered files not mentioned in commit or changelog
+
+[Expected outcome]
+- Isolated branch created: data-processor/v2.3.6
+- Cargo.toml version updated to "2.3.6"
+- Commit message: "fix(core): resolve memory leak in data processor"
+- CHANGELOG.md mentions only the memory leak fix
+- Merged to main with --no-ff
+- Pushed to remote, local branch deleted
+- User notified that external_sync.yml and internal_notes.txt were excluded from commit message as they're unrelated to project functionality
