@@ -27,6 +27,8 @@
    - 符合 Conventional Commits 規範的 commit message
    - 自動更新 CHANGELOG.md（Keep a Changelog 格式）
    - 智能判斷是否更新 README.md（基於版本變更類型）
+   - 支援多種專案版本文件格式（Cargo.toml、package.json、pyproject.toml、*.lock 等）
+   - 自動檢測版本文件並同步更新所有版本號
    - 敏感資訊檢測與脫敏處理
    - 支援主分支/非主分支不同流程
    - 提供實例參考，展示分支策略與版本管理
@@ -176,6 +178,8 @@ cursor-agents/
 ### Commiter
 - ✅ Conventional Commits 格式
 - ✅ Keep a Changelog v1.0.0 格式
+- ✅ 多種版本文件格式支援（Cargo.toml、package.json、pyproject.toml、*.lock）
+- ✅ 自動檢測並同步更新所有版本文件
 - ✅ 主分支隔離策略（自動建立版本分支）
 - ✅ 敏感資訊檢測與脫敏
 - ✅ 完整的驗證機制（最多重試 3 次）
