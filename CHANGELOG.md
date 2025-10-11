@@ -7,6 +7,23 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [1.4.0] - 2025-10-11
+
+### Added
+- 新增 Commiter Agent 語義分析能力，能夠理解專案性質並判斷變更的實際意義
+- 新增變更重要性分析原則（Change significance analysis principles），指導 AI 過濾無意義的變更
+- 新增無意義變更過濾機制，自動識別並排除與專案核心功能無關的檔案更新
+- 新增範例 5，展示如何過濾外部工作流程和內部筆記等無關變更
+
+### Changed
+- 擴充 Commiter Agent 步驟 2，加入專案性質理解和語義分析流程
+- 改進範例 3，從簡單文檔更新改為展示 AI/prompt 專案的功能變更判定邏輯
+- 更新技能列表，新增「語義分析能力」以區分措辭改進和功能性變更
+
+### Improved
+- 提升 Commiter Agent 對 AI/prompt 專案的理解能力，能正確判斷提示詞變更是否為功能性變更
+- 改進提交訊息和 CHANGELOG 的準確性，避免將無關變更納入提交記錄
+
 ## [1.3.0] - 2025-10-11
 
 ### Added
