@@ -1,6 +1,6 @@
-# Cursor AI Agents - 提示詞工程專案
+# Cursor & Codex AI Agents - 提示詞工程專案
 
-專為 Cursor IDE 設計的 AI Agent 規則集，提供專業的提示詞審查、優化與項目管理功能。
+專為 Cursor IDE 設計並擴充支援 Codex CLI 的 AI Agent 規則集，提供專業的提示詞審查、優化與項目管理功能。
 
 ## 📖 專案簡介
 
@@ -48,7 +48,7 @@
 
 #### 方法一：Python 安裝（推薦，支援並行下載）
 
-使用以下命令一鍵安裝，腳本會自動提供互動式選單讓你選擇安裝模式：
+使用以下命令一鍵安裝，腳本會先讓你選擇要安裝的 CLI 類型（Cursor 或 Codex），並提供互動式選單讓你設定安裝模式：
 
 ```bash
 # 使用 curl 下載並執行
@@ -70,28 +70,33 @@ curl -fsSL https://raw.githubusercontent.com/Yamiyorunoshura/Cursor-Agents/main/
 
 #### 安裝模式說明
 
-- **全域安裝**（推薦）：安裝到 `~/.cursor/`，對所有 Cursor 專案生效
-- **專案安裝**：安裝到當前專案的 `.cursor/`，只對當前專案生效（適合團隊協作）
-- **自訂路徑**：安裝到指定路徑（適合特殊需求）
+- **全域安裝**（推薦）：Cursor 安裝到 `~/.cursor/commands/`，Codex 安裝到 `~/.codex/prompts/`
+- **專案／工作區安裝**：Cursor 安裝到當前專案的 `.cursor/commands/`，Codex 安裝到 `.codex/prompts/`（適合團隊協作或單一工作區）
+- **自訂路徑**：安裝到指定路徑，腳本會自動建立對應的 `.cursor/commands/` 或 `.codex/prompts/` 子目錄
 
 #### 進階用法
 
 ```bash
 # 直接指定安裝模式（無需互動）
 python3 install.py global           # 全域安裝
-python3 install.py project          # 專案安裝
+python3 install.py project          # 專案／工作區安裝
 python3 install.py /custom/path     # 自訂路徑安裝
+
+# 指定 CLI 類型
+python3 install.py --cli codex      # 直接安裝到 Codex CLI
+python3 install.py --cli cursor     # 強制使用 Cursor CLI（預設值）
 
 # 使用環境變數
 INSTALL_MODE=project python3 install.py
 INSTALL_PATH=/custom/path python3 install.py
+INSTALL_CLI=codex python3 install.py
 ```
 
-> 💡 提示：Python 版本支援並行下載，安裝速度更快！腳本會自動提供互動式選單讓你選擇安裝模式。
+> 💡 提示：Python 版本支援並行下載，安裝速度更快！腳本會自動提供互動式選單讓你選擇 CLI 類型與安裝模式。
 
 ### 使用方法
 
-在 Cursor IDE 中，將以下文件拖入對話框以啟用對應的 Agent：
+預設情境下，在 Cursor IDE 中將以下文件拖入對話框即可啟用對應的 Agent；若採用 Codex CLI，請改用 `@prompts/...` 路徑：
 
 #### 1. 審查提示詞
 ```
@@ -211,4 +216,3 @@ Apache License 2.0
 ## 📮 聯絡方式
 
 如有任何問題或建議，請透過 GitHub Issues 聯繫我們。
-

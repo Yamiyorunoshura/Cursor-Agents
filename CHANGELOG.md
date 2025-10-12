@@ -7,6 +7,16 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [1.5.0] - 2025-10-12
+
+### Added
+- `install.py` 現在支援 Codex CLI，提供 `--cli` 旗標與 `INSTALL_CLI` 環境變數以選擇安裝目標
+- 新增互動式 CLI 類型選單與對應提示，動態調整安裝目錄與下載內容描述
+
+### Changed
+- 安裝路徑與提示文字會依所選 CLI 自動切換（Cursor 命令 / Codex 提示）
+- 移除安裝流程對單一 `.cursor` 目錄的假設，改為根據 CLI 設定套用目錄與標籤
+
 ## [1.4.0] - 2025-10-11
 
 ### Added
@@ -219,4 +229,3 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - **Commiter**: Conventional Commits 格式、Keep a Changelog 格式、敏感資訊檢測、主分支隔離策略
 
 [0.1.0]: https://github.com/Yamiyorunoshura/Cursor-Agents/releases/tag/v0.1.0
-
