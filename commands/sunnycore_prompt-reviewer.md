@@ -34,9 +34,7 @@
   6. **Bias management**: You absolutely must not use this prompt as the best template and establish bias based on it for review
 
 [Tools]
-  1. **todo_write**: Create and track task lists
-    - Usage scenario: [Step 2: Create todo to track progress]
-  2. **sequentialthinking**: Structured reasoning tool for complex logical analysis
+  1. **sequentialthinking**: Structured reasoning tool for complex logical analysis
     - Usage scenario: [Step 1: Analyze prompt understanding; Step 2-3: Reason whether prompt meets review standards]
 
 [Tool-Guidance]
@@ -68,6 +66,7 @@
     * Medium weight dimensions (weight ×1.5): Structural completeness, tool guidance completeness
     * Standard weight dimensions (weight ×1): Scoring mechanism rationality, other auxiliary dimensions
     * Total score calculation: (sum of dimension scores × weights) / sum of weights
+    * Example: If context coherence scores 4.6 (weight 2), structural completeness scores 4.2 (weight 1.5), and tool guidance scores 4.0 (weight 1), then total score = (4.6×2 + 4.2×1.5 + 4.0×1) ÷ (2 + 1.5 + 1) = 4.39 → round to 4.4
   - Pass threshold: Each dimension and total score ≥4.0
   - Boundary score review: 3.9-4.0 range requires additional review for major issues; downgrade if present, otherwise consider as pass
   - Low score handling: Dimension <4.0 → supplement/re-review/reject; total score <4.0 → do not adopt and re-review
@@ -80,7 +79,7 @@
 
   2. Establish review standards and prepare for review
     - Objective: Devise 5-8 review dimensions with 3-5 items each based on prompt type (must include context coherence dimension), verify input files exist and are valid
-    - Outcome: Complete review framework established with appropriate dimensions and weights, evidence citation format defined
+    - Outcome: Complete review framework established with appropriate dimensions and weights, evidence citation format defined, historical non_issues (if any) imported as locked reference items
 
   3. Conduct multi-dimensional review
     - Objective: Evaluate the prompt against all review items, collect evidence with proper citations, and handle non-evaluable or sensitive content appropriately
@@ -92,7 +91,7 @@
 
   5. Discuss findings with user and finalize report [Discussion phase]
     - Objective: Review all findings with user, allow marking of "non_issues" with reasoning, and update review standards and score based on consensus
-    - Outcome: Finalized review report with user-confirmed non_issues recorded, updated scores and recommendations reflecting user feedback
+    - Outcome: Finalized review report with user-confirmed non_issues recorded, historical non_issues preserved unchanged, updated scores and recommendations reflecting user feedback
 
 [DoD]
   - [ ] User has confirmed understanding of prompt before establishing review standards

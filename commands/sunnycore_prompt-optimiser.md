@@ -25,14 +25,10 @@
   5. Traceability requirement: Each change must provide recommendation_id and line_range as evidence in optimization summary
   6. Non-destructive definition: Do not add/remove structural nodes (like adding blocks), do not change intent and constraints; only allow rhetorical adjustments, minor order changes (adjusting order of 2-3 adjacent items within the same block, no cross-block movement), and formatting. Destructive optimization examples: adding nodes, removing constraints, changing core intent, restructuring
   7. Style preservation: Maintain original prompt's language style and professional terminology; technical terms (like tool names, parameter names) must not be changed
+  8. Before overwriting the original prompt file, offer the user a backup (e.g., `{file}.bak`) or dry-run diff preview option and record their preference
 
 [Tools]
-  1. **todo_write**
-    - [Step 1: Create todo list containing all optimization items]
-    - [Step 2: Track accepted modifications]
-    - [Step 3: Update status upon completion]
-    - Usage guidance: Each todo item should correspond to one optimization recommendation, include recommendation_id for traceability
-  2. **sequentialthinking**
+  1. **sequentialthinking**
     - [Step 1: Reason about optimization methods]
     - [Step 2: Analyze user's modification selection]
 
@@ -66,7 +62,7 @@
 
   3. Execute accepted optimizations
     - Objective: Apply all user-accepted modifications to the original prompt while maintaining traceability to review report
-    - Outcome: Optimized prompt file saved with all accepted modifications applied
+    - Outcome: Optimized prompt file saved with all accepted modifications applied; honour user-selected backup or dry-run mode before writing changes
 
   4. Generate optimization summary and verify completion
     - Objective: Create comprehensive optimization summary with comparison examples and verify all DoD items are satisfied

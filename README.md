@@ -4,9 +4,9 @@
 
 ## 📖 專案簡介
 
-本專案包含四個專業的 AI Agent，協助開發者進行提示詞工程與項目管理：
+本專案包含五個專業的 AI Agent，協助開發者進行提示詞工程與項目管理：
 
-### 🤖 四大核心 Agent
+### 🤖 五大核心 Agent
 
 1. **Prompt Reviewer** - 提示詞審查工程師
    - 深度語義理解與批判性思維
@@ -41,6 +41,12 @@
    - 根據專案類型生成對應的 .gitignore
    - 支援分支保護規則設定（基礎、標準、嚴格、自訂 4 種等級）
    - 提供實例參考，展示不同初始化場景
+
+5. **Prompt Engineerer** - 提示詞架構顧問
+   - 梳理與確認使用者需求與成功指標
+   - 規劃模組化提示詞架構與可調參數
+   - 起草可重複使用的提示詞模板與變體建議
+   - 紀錄設計原則與假設，方便後續維護
 
 ## 🚀 快速開始
 
@@ -132,6 +138,15 @@ INSTALL_CLI=codex python3 install.py
 - 建立 GitHub 遠端倉庫並推送
 - 可選設定分支保護規則（防止強制推送、要求 PR 審查等）
 
+#### 5. 設計提示詞架構
+```
+@commands/sunnycore_prompt_engineerer.md
+```
+當需要全新或可重複使用的提示詞時，Agent 會：
+- 梳理需求、輸入與限制並建立待辦追蹤
+- 提出模組化提示詞架構並邀請確認
+- 交付最終提示詞、設計原則與延伸使用建議
+
 ## 📁 專案結構
 
 ```
@@ -139,6 +154,7 @@ cursor-agents/
 ├── commands/                    # AI Agent 命令文件（包含完整規則）
 │   ├── sunnycore_commiter.md
 │   ├── sunnycore_initer.md
+│   ├── sunnycore_prompt_engineerer.md
 │   ├── sunnycore_prompt-optimiser.md
 │   └── sunnycore_prompt-reviewer.md
 ├── cursor-agents.lock           # 版本鎖定文件
@@ -172,6 +188,8 @@ cursor-agents/
 - ✅ 完整的證據追溯（區塊名稱 + 行號）
 - ✅ 支援「非問題」標注與歷史參照
 - ✅ 結構化推理（sequentialthinking）
+- ✅ 評分示例示範加權計算公式，方便快速校對
+- ✅ 歷史 non_issues 鎖定保留，避免重複審查
 
 ### Prompt Optimiser
 - ✅ 非破壞性優化（不改變原意）
@@ -179,6 +197,7 @@ cursor-agents/
 - ✅ 長度限制（增幅 <10%）
 - ✅ 完整的優化追溯（report_item_id + line_range）
 - ✅ 保持原風格與專業術語
+- ✅ 覆寫前提供備份或差異預覽選項，強化風險控管
 
 ### Commiter
 - ✅ Conventional Commits 格式
@@ -190,6 +209,7 @@ cursor-agents/
 - ✅ 完整的驗證機制（最多重試 3 次）
 - ✅ 語義分析能力（理解專案性質，判斷變更的實際意義）
 - ✅ 智能變更過濾（自動排除與專案核心功能無關的檔案更新）
+- ✅ fix/feat 情境驗證與自我檢查流程，降低誤判風險
 
 ### Initer
 - ✅ 自動化專案初始化流程
@@ -198,12 +218,17 @@ cursor-agents/
 - ✅ GitHub CLI 整合（自動建立遠端倉庫）
 - ✅ 分支保護規則設定（4 種等級：基礎、標準、嚴格、自訂）
 - ✅ 檔案覆蓋保護機制
+- ✅ 部分拒絕時保留其他檔案流程，並提供遠端建立失敗的補救指引
+
+### Prompt Engineerer
+- ✅ 需求澄清流程，將目標、限制與成功指標具體化
+- ✅ 模組化提示詞架構，保留參數化插槽方便復用
+- ✅ 完整交付包含最終提示詞、設計原則與延伸建議
+- ✅ 與 sequentialthinking 整合，系統化檢查需求覆蓋度
 
 ## 🛠️ 工具整合
 
-所有 Agent 皆支援以下工具：
-- **todo_write** - 任務追蹤與進度管理
-- **sequentialthinking** - 結構化推理（1-8 步）
+所有 Agent 皆支援 **sequentialthinking** 結構化推理工具，確保决策透明且可追溯。
 
 ## 📝 授權
 

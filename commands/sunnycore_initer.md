@@ -51,7 +51,7 @@
   2. Must confirm user has installed GitHub CLI (`gh`) and completed authentication, provide installation guide if not installed
   3. LICENSE file must use correct and complete license text
   4. All files use UTF-8 encoding
-  5. If files already exist (README.md, CHANGELOG.md, LICENSE, .gitignore), must ask user whether to overwrite; if user rejects overwriting all files, terminate initialization with explanation
+  5. If files already exist (README.md, CHANGELOG.md, LICENSE, .gitignore), must ask user whether to overwrite; skip only the files the user rejects and continue with remaining scope; if user declines every required file, stop and explain the impact
   6. Project name must not contain special characters (only letters, numbers, hyphens, underscores allowed)
   7. Commit messages must comply with Conventional Commits format (see https://www.conventionalcommits.org/)
   8. Branch protection rules can only be configured after GitHub remote repository is successfully created
@@ -76,11 +76,11 @@
 
   3. Create project documentation files
     - Objective: Generate professional documentation files (README.md, CHANGELOG.md, LICENSE, .gitignore) based on user preferences, only creating/overwriting files user confirmed
-    - Outcome: All user-approved documentation files created with appropriate content and format; files user rejected are skipped
+    - Outcome: All user-approved documentation files created with appropriate content and format; files user rejected are skipped and logged with rationale
 
   4. Initialize git repository and push to GitHub
     - Objective: Stage created files, execute initial commit, create GitHub remote repository, and establish remote connection
-    - Outcome: Local repository initialized with initial commit, GitHub remote repository created and linked, changes pushed successfully
+    - Outcome: Local repository initialized with initial commit, GitHub remote repository created and linked, changes pushed successfully; if remote creation fails, capture the state (committed locally) and guide user on retrying `gh repo create` once prerequisites are met
 
   5. Configure branch protection rules (if requested)
     - Objective: Set up branch protection rules based on user's selected protection level (Basic/Standard/Strict/Custom)
@@ -89,12 +89,6 @@
   6. Verify initialization completion
     - Objective: Confirm all files exist, git history is correct, remote connection is established, and protection rules are applied (if configured)
     - Outcome: Complete initialization summary presented to user with next steps suggestions
-
-[Tools]
-  1. **todo_write**
-    - [Before Step 1: Create todo list after completing pre-checks, listing all initialization tasks]
-    - [Steps 1-5: Update task status after completing each sub-phase (environment verification, information gathering, file creation, git operations, branch protection configuration)]
-    - [Step 6: Mark all tasks as completed during verification phase]
 
 [DoD]
   - [ ] README.md has been created (includes project name and description)
@@ -174,5 +168,4 @@
 - CHANGELOG.md and .gitignore created
 - Git operations paused, user guided to authenticate gh CLI
 - Partial initialization saved, ready to resume after authentication
-
 

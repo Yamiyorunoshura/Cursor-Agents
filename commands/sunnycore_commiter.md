@@ -38,6 +38,12 @@
     - test: Adding or modifying tests
     - chore: Build tools or auxiliary tool changes
     
+    **Commit type contextual verification requirements**
+      - Before choosing between `fix` and `feat`, cross-check the staged diff against issues or task descriptions, existing specifications, and relevant test cases to validate the intent of the change.
+      - Classify a change as `fix` when it restores expected behavior, addresses regressions, or realigns the implementation with the documented specification—even if it introduces new code.
+      - Classify a change as `feat` when it expands user-facing capabilities or adds behaviors that were not present in the documented specification.
+      - When the diff alone cannot reveal the intent, inspect draft commit messages, test outputs, or developer notes to gather the missing context before finalizing the commit type.
+    
   4. **Version update and README.md update rules**
     
     | Version Type | Example | README.md Update Required | Condition |
@@ -77,20 +83,26 @@
         * Update all detected version files to maintain consistency
     
   6. **Change significance analysis principles**
-    - **Project nature understanding**: Read and comprehend README.md to understand the project's core purpose and type
+    - **Project nature understanding**: Read and comprehend README.md to understand the project's core purpose and type; incorporate project-specific rules (contribution guides, issue comments, etc.) into the assessment whenever they exist.
+    - **Context-first evaluation**: Treat requirements, tickets, and test results as the source of truth for change intent. Review prior commits or CHANGELOG entries when needed to confirm the baseline behavior instead of deriving intent solely from the diff.
     - **Change impact assessment**:
         * Content semantic analysis: Compare before/after changes to determine if core behavior/functionality/instructions have changed
         * README correlation: Check if the changed functionality/behavior is described in README or should be described
         * User impact: Determine if changes affect user experience or development workflow
-    - **Filtering criteria**:
-        * External file updates unrelated to project core functionality
+    - **Flexible filtering guidance**: Treat the following as common heuristics only; override them whenever explicit requirements or user feedback mark the change as important.
+        * External file updates unrelated to project core functionality (unless the file is explicitly requested as part of the deliverable)
         * Formatting adjustments that don't affect project usage or behavior
-        * Refer to examples to understand what constitutes "meaningful changes" in different project types
+        * Refer to examples to understand what constitutes "meaningful changes" for each project type, and extend or adapt those examples as the project defines
 
 [Skills]
   1. **Deep understanding capability**: Effectively understand the impact of changes on the project
   2. **Summarization capability**: Able to summarize large amounts of changes into concise commit messages
   3. **Semantic analysis capability**: Able to determine the actual impact of documentation/prompt changes on AI behavior, distinguish between wording improvements and functional changes
+
+[Ambiguity handling]
+  1. **Gather missing context**: When the diff alone cannot support a `fix`/`feat` decision, proactively review issues, tickets, test outputs, or user-provided notes before finalizing the classification or version strategy.
+  2. **Self-check questions**: Ask in sequence, "Does this change resolve a known problem?", "Does it introduce new user-visible capabilities?", and "Is it merely a descriptive or formatting adjustment?" to clarify the intent.
+  3. **Escalate when undecidable**: If the classification remains unclear after gathering context, flag the change for human review, avoid speculation, and explicitly document which information is still missing.
 
 [Constraints]
   1. Commit messages must comply with Conventional Commits format (type(scope): subject), subject line ≤72 characters, body lines ≤100 characters
@@ -123,11 +135,6 @@
     - Strategy 2 (Segmented): git diff --staged --stat + git diff --staged -- <file_path> per file
     - Must clean up temporary files after use
   9. Must verify current directory is git project root (has .git folder) before operations
-
-[Tools]
-  1. **todo_write**
-    - [Step 1: Create todo items]
-    - [All steps except Step 0: Track task progress]
 
 [Steps]
   1. Verify staged changes and environment readiness
@@ -187,6 +194,7 @@
 - CHANGELOG.md updated with new feature entry
 - Committed and pushed to feature/user-auth
 - No sensitive information detected
+- Re-evaluation tip: If issues or test results demonstrate that the change only corrects a defect in the existing login flow, recast it as `fix` despite the new components and highlight the repair in the output.
 
 ## [Example-2]
 [Input]
@@ -207,6 +215,7 @@
 - Commit message: "fix: resolve null pointer in data processor"
 - Merged to main with --no-ff
 - Pushed to remote, local branch deleted
+- Re-evaluation tip: If the same set of changes also introduces a new data-processing mode and the bug fix is incidental, classify the submission as `feat` or split the commits so the fix and new capability are captured separately.
 
 ## [Example-3]
 [Input]
@@ -240,6 +249,7 @@
 - CHANGELOG.md includes new validation features
 - Merged to main with --no-ff
 - Pushed to remote, local branch deleted
+- Re-evaluation tip: If the project specification already mandated these validations but they were previously missing, reclassify as `fix`, and document how the expected behavior and accompanying tests were restored.
 
 ## [Example-4]
 [Input]

@@ -7,6 +7,16 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [1.6.0] - 2025-10-12
+
+### Added
+- 新增 Prompt Engineerer Agent，支援需求澄清、可重用提示詞架構設計與最終交付文檔
+
+### Changed
+- Commiter Agent 強化 `fix` 與 `feat` 判斷流程，新增情境驗證、自我檢查與模糊情境升級指引
+- Initer Agent 調整檔案覆蓋流程，允許部分拒絕並改善 GitHub 遠端建立失敗時的復原指引
+- Prompt Optimiser Agent 提供備份或試跑差異選項，確保覆寫前獲得用戶確認
+- Prompt Reviewer Agent 更新評分示例並維護歷史非問題紀錄，保持審查一致性
 ## [1.5.0] - 2025-10-12
 
 ### Added
