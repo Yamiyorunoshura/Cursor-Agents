@@ -52,6 +52,22 @@ API_URL = "https://api.github.com/repos/Yamiyorunoshura/Cursor-Agents/contents"
 cursor_dir = ""
 commands_dir = ""
 install_mode = ""
+cli_type = "cursor"
+
+CLI_SETTINGS = {
+    'cursor': {
+        'display_name': 'Cursor CLI',
+        'base_dir_name': '.cursor',
+        'payload_dir_name': 'commands',
+        'payload_label': '命令文件'
+    },
+    'codex': {
+        'display_name': 'Codex CLI',
+        'base_dir_name': '.codex',
+        'payload_dir_name': 'prompts',
+        'payload_label': '提示文件'
+    }
+}
 
 
 def log_info(message: str) -> None:
@@ -87,9 +103,76 @@ def check_dependencies() -> None:
     log_success("系統依賴檢查完成")
 
 
+def determine_cli_type(args: argparse.Namespace) -> str:
+    """決定要安裝的 CLI 類型"""
+    global cli_type
+
+    candidate = None
+
+    if args.cli:
+        candidate = args.cli.lower()
+    elif os.environ.get('INSTALL_CLI'):
+        candidate = os.environ['INSTALL_CLI'].lower()
+
+    if candidate and candidate not in CLI_SETTINGS:
+        log_warning(f"未知的 CLI 類型「{candidate}」，將進入互動式選擇")
+        candidate = None
+
+    if candidate and candidate in CLI_SETTINGS:
+        cli_type = candidate
+        log_success(f"已選擇 CLI：{CLI_SETTINGS[cli_type]['display_name']}")
+        return cli_type
+
+    input_source = None
+
+    if sys.stdin.isatty():
+        input_source = sys.stdin
+    else:
+        try:
+            if sys.platform != 'win32':
+                input_source = open('/dev/tty', 'r')
+                log_info("已連接到終端進行互動式輸入")
+        except (OSError, IOError):
+            pass
+
+    if input_source:
+        print()
+        log_info("請選擇要安裝的 CLI 類型：")
+        print("  1) Cursor CLI (安裝到 .cursor/commands)")
+        print("  2) Codex CLI (安裝到 .codex/prompts)")
+        print()
+        sys.stdout.write(f"{Colors.YELLOW}請輸入選項 [1-2]{Colors.NC} (預設為 1，直接按 Enter 使用預設值): ")
+        sys.stdout.flush()
+
+        try:
+            choice = input_source.readline().strip() or '1'
+            if choice == '2':
+                cli_type = 'codex'
+            else:
+                if choice != '1':
+                    log_warning(f"無效選項「{choice}」，已選擇預設值 (Cursor CLI)")
+                cli_type = 'cursor'
+        except (EOFError, KeyboardInterrupt):
+            log_warning("\n無法讀取用戶輸入，使用預設 CLI (Cursor)")
+            cli_type = 'cursor'
+        finally:
+            if input_source != sys.stdin:
+                try:
+                    input_source.close()
+                except Exception:
+                    pass
+    else:
+        cli_type = 'cursor'
+        log_info("無法進行互動式選擇，使用預設 CLI (Cursor)")
+
+    log_success(f"已選擇 CLI：{CLI_SETTINGS[cli_type]['display_name']}")
+    return cli_type
+
+
 def determine_install_path(args: argparse.Namespace) -> Tuple[str, str, str]:
     """決定安裝路徑"""
     global cursor_dir, commands_dir, install_mode
+    settings = CLI_SETTINGS.get(cli_type, CLI_SETTINGS['cursor'])
     
     log_info("決定安裝路徑...")
     
@@ -137,8 +220,12 @@ def determine_install_path(args: argparse.Namespace) -> Tuple[str, str, str]:
         if input_source:
             print()
             log_info("請選擇安裝模式：")
-            print("  1) 全域安裝（安裝到 ~/.cursor/，對所有專案生效）")
-            print("  2) 專案安裝（安裝到當前目錄 ./.cursor/，只對當前專案生效）")
+            if cli_type == 'codex':
+                print("  1) 全域安裝（安裝到 ~/.codex/，對所有使用者生效）")
+                print("  2) 工作區安裝（安裝到當前目錄 ./.codex/，只對當前專案生效）")
+            else:
+                print("  1) 全域安裝（安裝到 ~/.cursor/，對所有專案生效）")
+                print("  2) 專案安裝（安裝到當前目錄 ./.cursor/，只對當前專案生效）")
             print("  3) 自訂路徑")
             print()
             sys.stdout.write(f"{Colors.YELLOW}請輸入選項 [1-3]{Colors.NC} (預設為 1，直接按 Enter 使用預設值): ")
@@ -155,7 +242,10 @@ def determine_install_path(args: argparse.Namespace) -> Tuple[str, str, str]:
                     log_success("已選擇：專案安裝")
                 elif choice == '3':
                     print()
-                    sys.stdout.write(f"{Colors.YELLOW}請輸入安裝路徑{Colors.NC} (支援 ~ 符號): ")
+                    if cli_type == 'codex':
+                        sys.stdout.write(f"{Colors.YELLOW}請輸入基礎目錄{Colors.NC} (將在其中建立 {settings['base_dir_name']}/，支援 ~ 符號): ")
+                    else:
+                        sys.stdout.write(f"{Colors.YELLOW}請輸入安裝路徑{Colors.NC} (支援 ~ 符號): ")
                     sys.stdout.flush()
                     cursor_dir = input_source.readline().strip()
                     if not cursor_dir:
@@ -182,26 +272,36 @@ def determine_install_path(args: argparse.Namespace) -> Tuple[str, str, str]:
             install_mode = 'global'
     
     # 根據模式設定實際路徑
+    base_dir_name = settings['base_dir_name']
     if install_mode == 'global':
-        cursor_dir = str(Path.home() / '.cursor')
-        log_info("安裝模式：全域安裝")
+        cursor_dir = str(Path.home() / base_dir_name)
+        if cli_type == 'codex':
+            log_info("安裝模式：全域安裝（所有使用者）")
+        else:
+            log_info("安裝模式：全域安裝")
     elif install_mode == 'project':
-        cursor_dir = str(Path.cwd() / '.cursor')
-        log_info("安裝模式：專案安裝")
+        cursor_dir = str(Path.cwd() / base_dir_name)
+        if cli_type == 'codex':
+            log_info("安裝模式：工作區安裝")
+        else:
+            log_info("安裝模式：專案安裝")
     elif install_mode == 'custom':
         # 展開 ~ 符號
-        cursor_dir = str(Path(cursor_dir).expanduser())
+        expanded_path = Path(cursor_dir).expanduser()
+        if cli_type == 'codex' and expanded_path.name != base_dir_name:
+            expanded_path = expanded_path / base_dir_name
+        cursor_dir = str(expanded_path)
         log_info("安裝模式：自訂路徑")
     else:
-        cursor_dir = str(Path.home() / '.cursor')
+        cursor_dir = str(Path.home() / base_dir_name)
         log_info("安裝模式：全域安裝（預設）")
     
-    commands_dir = str(Path(cursor_dir) / 'commands')
+    commands_dir = str(Path(cursor_dir) / settings['payload_dir_name'])
     
     print()
     log_success("安裝路徑已確定：")
     print(f"  - 主目錄: {cursor_dir}")
-    print(f"  - 命令文件: {commands_dir}")
+    print(f"  - {settings['payload_label']}: {commands_dir}")
     print()
     
     return cursor_dir, commands_dir, install_mode
@@ -313,10 +413,11 @@ def download_directory(dir_name: str, dest_dir: str, max_workers: int = 5) -> bo
 
 def download_commands() -> bool:
     """下載所有命令文件"""
-    log_info("下載命令文件...")
+    settings = CLI_SETTINGS.get(cli_type, CLI_SETTINGS['cursor'])
+    log_info(f"下載{settings['payload_label']}...")
     if not download_directory("commands", commands_dir):
         return False
-    log_success("命令文件下載完成")
+    log_success(f"{settings['payload_label']}下載完成")
     return True
 
 
@@ -342,22 +443,30 @@ def show_usage() -> None:
     log_success("  Cursor AI Agents 安裝完成！")
     log_success("==========================================")
     print()
+    settings = CLI_SETTINGS.get(cli_type, CLI_SETTINGS['cursor'])
     log_info("安裝位置：")
-    print(f"  - 命令文件: {commands_dir}")
+    print(f"  - {settings['payload_label']}: {commands_dir}")
     print()
     
     if install_mode == 'project':
-        log_warning("您使用了專案安裝模式，Agent 命令只會在當前專案中生效")
+        if cli_type == 'codex':
+            log_warning("您使用了工作區安裝模式，提示只會在當前專案中可用")
+        else:
+            log_warning("您使用了專案安裝模式，Agent 命令只會在當前專案中生效")
         log_info("如需在其他專案中使用，請重新執行安裝腳本")
         print()
     elif install_mode == 'global':
-        log_info("您使用了全域安裝模式，Agent 命令將對所有 Cursor 專案生效")
+        if cli_type == 'codex':
+            log_info("您使用了全域安裝模式，提示將對此使用者的所有 Codex CLI 可用")
+        else:
+            log_info("您使用了全域安裝模式，Agent 命令將對所有 Cursor 專案生效")
         print()
 
 
 def check_existing_installation() -> None:
     """檢查是否已安裝並移除舊版本"""
     commands_path = Path(commands_dir)
+    settings = CLI_SETTINGS.get(cli_type, CLI_SETTINGS['cursor'])
     
     if commands_path.exists() and any(commands_path.iterdir()):
         log_warning("檢測到已存在的安裝")
@@ -366,7 +475,7 @@ def check_existing_installation() -> None:
         # 移除舊的命令文件
         if commands_path.exists():
             shutil.rmtree(commands_path)
-            log_success("已移除舊的命令文件")
+            log_success(f"已移除舊的{settings['payload_label']}")
         
         # 移除舊的版本鎖定文件
         lock_file = Path(cursor_dir) / "cursor-agents.lock"
@@ -393,6 +502,11 @@ def main():
         help='安裝模式或路徑 (global/project/自訂路徑)'
     )
     parser.add_argument(
+        '--cli',
+        choices=sorted(CLI_SETTINGS.keys()),
+        help='指定要安裝的 CLI 類型 (cursor/codex)'
+    )
+    parser.add_argument(
         '-w', '--workers',
         type=int,
         default=10,
@@ -403,12 +517,13 @@ def main():
     
     print()
     log_info("==========================================")
-    log_info("  Cursor AI Agents 安裝程式 (Python)")
+    log_info("  Cursor & Codex Agents 安裝程式 (Python)")
     log_info("==========================================")
     print()
     
     try:
         check_dependencies()
+        determine_cli_type(args)
         cursor_dir, commands_dir, install_mode = determine_install_path(args)
         check_existing_installation()
         create_directories()
@@ -433,4 +548,3 @@ def main():
 
 if __name__ == '__main__':
     main()
-
