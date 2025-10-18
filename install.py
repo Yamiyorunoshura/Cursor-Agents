@@ -66,6 +66,12 @@ CLI_SETTINGS = {
         'base_dir_name': '.codex',
         'payload_dir_name': 'prompts',
         'payload_label': '提示文件'
+    },
+    'roo': {
+        'display_name': 'Roo Code',
+        'base_dir_name': '.roo',
+        'payload_dir_name': 'commands',
+        'payload_label': '命令文件'
     }
 }
 
@@ -140,18 +146,21 @@ def determine_cli_type(args: argparse.Namespace) -> str:
         log_info("請選擇要安裝的 CLI 類型：")
         print("  1) Cursor CLI (安裝到 .cursor/commands)")
         print("  2) Codex CLI (安裝到 .codex/prompts)")
+        print("  3) Roo Code (安裝到 .roo/commands)")
         print()
-        sys.stdout.write(f"{Colors.YELLOW}請輸入選項 [1-2]{Colors.NC} (預設為 1，直接按 Enter 使用預設值): ")
+        sys.stdout.write(f"{Colors.YELLOW}請輸入選項 [1-3]{Colors.NC} (預設為 1，直接按 Enter 使用預設值): ")
         sys.stdout.flush()
 
         try:
             choice = input_source.readline().strip() or '1'
-            if choice == '2':
-                cli_type = 'codex'
-            else:
-                if choice != '1':
-                    log_warning(f"無效選項「{choice}」，已選擇預設值 (Cursor CLI)")
-                cli_type = 'cursor'
+            options = {
+                '1': 'cursor',
+                '2': 'codex',
+                '3': 'roo'
+            }
+            cli_type = options.get(choice, 'cursor')
+            if choice not in options:
+                log_warning(f"無效選項「{choice}」，已選擇預設值 (Cursor CLI)")
         except (EOFError, KeyboardInterrupt):
             log_warning("\n無法讀取用戶輸入，使用預設 CLI (Cursor)")
             cli_type = 'cursor'
@@ -220,12 +229,13 @@ def determine_install_path(args: argparse.Namespace) -> Tuple[str, str, str]:
         if input_source:
             print()
             log_info("請選擇安裝模式：")
+            base_dir_name = settings['base_dir_name']
             if cli_type == 'codex':
-                print("  1) 全域安裝（安裝到 ~/.codex/，對所有使用者生效）")
-                print("  2) 工作區安裝（安裝到當前目錄 ./.codex/，只對當前專案生效）")
+                print(f"  1) 全域安裝（安裝到 ~/{base_dir_name}/，對所有使用者生效）")
+                print(f"  2) 工作區安裝（安裝到當前目錄 ./{base_dir_name}/，只對當前專案生效）")
             else:
-                print("  1) 全域安裝（安裝到 ~/.cursor/，對所有專案生效）")
-                print("  2) 專案安裝（安裝到當前目錄 ./.cursor/，只對當前專案生效）")
+                print(f"  1) 全域安裝（安裝到 ~/{base_dir_name}/，對所有專案生效）")
+                print(f"  2) 專案安裝（安裝到當前目錄 ./{base_dir_name}/，只對當前專案生效）")
             print("  3) 自訂路徑")
             print()
             sys.stdout.write(f"{Colors.YELLOW}請輸入選項 [1-3]{Colors.NC} (預設為 1，直接按 Enter 使用預設值): ")
@@ -242,7 +252,7 @@ def determine_install_path(args: argparse.Namespace) -> Tuple[str, str, str]:
                     log_success("已選擇：專案安裝")
                 elif choice == '3':
                     print()
-                    if cli_type == 'codex':
+                    if cli_type in ('codex', 'roo'):
                         sys.stdout.write(f"{Colors.YELLOW}請輸入基礎目錄{Colors.NC} (將在其中建立 {settings['base_dir_name']}/，支援 ~ 符號): ")
                     else:
                         sys.stdout.write(f"{Colors.YELLOW}請輸入安裝路徑{Colors.NC} (支援 ~ 符號): ")
@@ -288,7 +298,7 @@ def determine_install_path(args: argparse.Namespace) -> Tuple[str, str, str]:
     elif install_mode == 'custom':
         # 展開 ~ 符號
         expanded_path = Path(cursor_dir).expanduser()
-        if cli_type == 'codex' and expanded_path.name != base_dir_name:
+        if cli_type in ('codex', 'roo') and expanded_path.name != base_dir_name:
             expanded_path = expanded_path / base_dir_name
         cursor_dir = str(expanded_path)
         log_info("安裝模式：自訂路徑")
@@ -451,6 +461,8 @@ def show_usage() -> None:
     if install_mode == 'project':
         if cli_type == 'codex':
             log_warning("您使用了工作區安裝模式，提示只會在當前專案中可用")
+        elif cli_type == 'roo':
+            log_warning("您使用了專案安裝模式，Roo Code 命令只會在當前專案中生效")
         else:
             log_warning("您使用了專案安裝模式，Agent 命令只會在當前專案中生效")
         log_info("如需在其他專案中使用，請重新執行安裝腳本")
@@ -458,6 +470,8 @@ def show_usage() -> None:
     elif install_mode == 'global':
         if cli_type == 'codex':
             log_info("您使用了全域安裝模式，提示將對此使用者的所有 Codex CLI 可用")
+        elif cli_type == 'roo':
+            log_info("您使用了全域安裝模式，Roo Code 命令將對所有專案生效")
         else:
             log_info("您使用了全域安裝模式，Agent 命令將對所有 Cursor 專案生效")
         print()
@@ -504,7 +518,7 @@ def main():
     parser.add_argument(
         '--cli',
         choices=sorted(CLI_SETTINGS.keys()),
-        help='指定要安裝的 CLI 類型 (cursor/codex)'
+        help='指定要安裝的 CLI 類型 (cursor/codex/roo)'
     )
     parser.add_argument(
         '-w', '--workers',
