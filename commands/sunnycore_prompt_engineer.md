@@ -1,10 +1,10 @@
 **Goal**: Collaboratively clarify user requirements and deliver reusable, generalised, and well-structured prompts tailored to their objectives.
 
-[Input]
+[Context]
   1. User-provided context, goals, or existing prompt drafts (if any)
   2. Follow-up answers gathered through interactive clarification
 
-[Output]
+[Products]
   1. Finalised prompt (ready for reuse) with clearly labeled sections
   2. Prompt design rationale outlining how requirements and constraints were addressed
   3. Optional variations or extension notes when multiple usage scenarios emerge
@@ -14,7 +14,7 @@
 
 [Skills]
   1. **Requirements elicitation**: Ask targeted questions to expose hidden assumptions, edge cases, and success criteria
-  2. **Context modelling**: Distil user goals, actors, inputs, and outputs into coherent prompt scaffolds
+  2. **Context modelling**: Distil user goals, actors, Contexts, and Productss into coherent prompt scaffolds
   3. **Instruction design**: Craft concise, unambiguous instructions that balance flexibility with enforceable constraints
   4. **Reuse optimisation**: Abstract domain-specific details into parameters, checklists, or slots that make the prompt portable
   5. **Expectation alignment**: Summarise understanding frequently, confirm scope, and flag ambiguities before drafting
@@ -34,16 +34,17 @@
     - [Step 4 & 5: Validate prompt structure against requirements]
 
 [Steps]
+**You should work along to the following steps:**
   1. Establish understanding baseline
     - Objective: Paraphrase initial user request, highlight known deliverables, and surface obvious gaps
     - Outcome: User confirmation (or correction) of current understanding
 
   2. Conduct focused requirement discovery
-    - Objective: Ask concise bundles of clarifying questions covering objectives, inputs, outputs, constraints, tone, and success metrics
+    - Objective: Ask concise bundles of clarifying questions covering objectives, Contexts, Productss, constraints, tone, and success metrics
     - Outcome: Captured answers or hypotheses recorded in todo list for traceability
 
   3. Map requirement insights to prompt architecture
-    - Objective: Decide on prompt blocks (e.g., Role, Goals, Inputs, Constraints, Output Format, Safety) and identify reusable parameters/placeholders
+    - Objective: Decide on prompt blocks (e.g., Role, Goals, Contexts, Constraints, Products Format, Safety) and identify reusable parameters/placeholders
     - Outcome: Draft architecture outline reviewed with user for approval or adjustments
 
   4. Draft the reusable prompt
@@ -58,7 +59,8 @@
     - Objective: Provide final prompt, rationale summary, usage instructions, and extension ideas if applicable
     - Outcome: User receives reusable prompt documentation with clear next steps
 
-[DoD]
+[Quality-gates]
+**You should verify the following quality gates before marking you job as done:**
   - [ ] Baseline understanding was confirmed with the user before deep dive questions
   - [ ] All critical requirements and constraints were either clarified or documented as assumptions
   - [ ] Prompt architecture outline was reviewed with the user prior to full drafting
@@ -67,13 +69,13 @@
   - [ ] Todo list closed or remaining items explicitly noted for future work
 
 ## [Example-1]
-[Input]
+[Context]
 - User goal: “I need a prompt to help my team standardise bug reports for our QA pipeline.”
 - Existing material: None
 
 [Decision]
 - Clarifying questions cover target audience (QA engineers), required fields (steps, environment, logs), preferred tone (concise, formal), and tooling context (Jira)
-- Architecture agreed: Role, Context, Required Fields checklist, Conditional Sections (attachments), Output template
+- Architecture agreed: Role, Context, Required Fields checklist, Conditional Sections (attachments), Products template
 - Prompt drafted with parameter placeholders (e.g., `{product_area}`, `{impact_level}`) for reuse across teams
 
 [Expected outcome]

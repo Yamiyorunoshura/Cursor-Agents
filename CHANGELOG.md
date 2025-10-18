@@ -7,6 +7,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [1.6.1] - 2025-10-19
+### Changed
+- 改善了提示詞的格式
+- 優化提示詞，提高LLM的指令遵循能力
+
 ## [1.6.0] - 2025-10-12
 
 ### Added

@@ -1,9 +1,9 @@
 **Goal**: Initialize a new project with professional documentation structure (README.md, CHANGELOG.md, LICENSE, .gitignore), create GitHub remote repository, and optionally configure branch protection rules.
 
-[Input]
+[Context]
   None (User will provide information through interaction)
 
-[Output]
+[Products]
   1. README.md (initial template)
   2. CHANGELOG.md (Keep a Changelog format)
   3. .gitignore (project type + general template)
@@ -66,6 +66,7 @@
   17. Copyright holder for LICENSE: Use `git config user.name` as default, prompt user if empty
 
 [Steps]
+**You should work along to the following steps:**
   1. Verify environment and prepare for initialization
     - Objective: Ensure git repository exists, GitHub CLI is installed and authenticated, and identify any existing files that may need overwriting
     - Outcome: Environment ready for initialization, user informed of any file conflicts, todo list created to track progress
@@ -90,7 +91,8 @@
     - Objective: Confirm all files exist, git history is correct, remote connection is established, and protection rules are applied (if configured)
     - Outcome: Complete initialization summary presented to user with next steps suggestions
 
-[DoD]
+[Quality-gates]
+**You should verify the following quality gates before marking you job as done:**
   - [ ] README.md has been created (includes project name and description)
   - [ ] CHANGELOG.md has been created (Keep a Changelog format)
   - [ ] .gitignore has been created (project type + general template)
@@ -101,10 +103,10 @@
   - [ ] Remote configuration has been verified (git remote -v)
   - [ ] Branch protection rules have been configured (optional, only if user chose to configure)
   - [ ] All todo items have been completed
-  - [ ] Initialization completion summary has been output
+  - [ ] Initialization completion summary has been Products
 
 ## [Example-1]
-[Input]
+[Context]
 - User information collected via interaction:
   * Project name: my-web-app
   * Description: A modern web application
@@ -125,10 +127,10 @@
 - Git initialized with initial commit: "chore: initial commit"
 - GitHub repo created: https://github.com/{user}/my-web-app
 - Remote linked and pushed
-- Summary output with next steps
+- Summary Products with next steps
 
 ## [Example-2]
-[Input]
+[Context]
 - Project name: data-pipeline
 - Description: Python-based data processing pipeline
 - Type: Python
@@ -150,7 +152,7 @@
 - Initialization complete with summary
 
 ## [Example-3]
-[Input]
+[Context]
 - Existing files detected: README.md, LICENSE already exist
 - Project name: legacy-project
 - Type: Generic

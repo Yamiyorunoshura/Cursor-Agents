@@ -1,6 +1,6 @@
 **Goal**: Analyze staged changes, generate compliant commit messages, update project documentation (CHANGELOG.md, README.md), and safely commit and push to the appropriate branch while preventing sensitive information exposure.
 
-[Input]
+[Context]
   1. git diff --staged (changes staged to index)
      - For long diffs, use one of the following strategies to avoid truncation:
        * Strategy 1 (Temporary file): git diff --staged > /tmp/staged_diff.txt then read file
@@ -9,7 +9,7 @@
        * Strategy 4 (Combined): Use git diff --staged --stat for overview + git diff --staged --unified=3 for context
   2. Version files (detected automatically based on project type)
 
-[Output]
+[Products]
   1. Commit message compliant with modern project management
   2. Updated CHANGELOG.md
   3. Updated README.md
@@ -42,7 +42,7 @@
       - Before choosing between `fix` and `feat`, cross-check the staged diff against issues or task descriptions, existing specifications, and relevant test cases to validate the intent of the change.
       - Classify a change as `fix` when it restores expected behavior, addresses regressions, or realigns the implementation with the documented specification—even if it introduces new code.
       - Classify a change as `feat` when it expands user-facing capabilities or adds behaviors that were not present in the documented specification.
-      - When the diff alone cannot reveal the intent, inspect draft commit messages, test outputs, or developer notes to gather the missing context before finalizing the commit type.
+      - When the diff alone cannot reveal the intent, inspect draft commit messages, test Productss, or developer notes to gather the missing context before finalizing the commit type.
     
   4. **Version update and README.md update rules**
     
@@ -100,7 +100,7 @@
   3. **Semantic analysis capability**: Able to determine the actual impact of documentation/prompt changes on AI behavior, distinguish between wording improvements and functional changes
 
 [Ambiguity handling]
-  1. **Gather missing context**: When the diff alone cannot support a `fix`/`feat` decision, proactively review issues, tickets, test outputs, or user-provided notes before finalizing the classification or version strategy.
+  1. **Gather missing context**: When the diff alone cannot support a `fix`/`feat` decision, proactively review issues, tickets, test Productss, or user-provided notes before finalizing the classification or version strategy.
   2. **Self-check questions**: Ask in sequence, "Does this change resolve a known problem?", "Does it introduce new user-visible capabilities?", and "Is it merely a descriptive or formatting adjustment?" to clarify the intent.
   3. **Escalate when undecidable**: If the classification remains unclear after gathering context, flag the change for human review, avoid speculation, and explicitly document which information is still missing.
 
@@ -137,6 +137,7 @@
   9. Must verify current directory is git project root (has .git folder) before operations
 
 [Steps]
+**You should work along to the following steps:**
   1. Verify staged changes and environment readiness
     - Objective: Ensure staged diff is valid, parseable, and free of sensitive information
     - Outcome: Valid diff content ready for analysis, project environment verified
@@ -164,19 +165,20 @@
     - Objective: Safely commit changes to the correct branch and push to remote repository
     - Outcome: Changes committed on isolated branch (if main branch) or current branch (if feature branch), merged to main (if applicable), and pushed successfully to remote
 
-[DoD]
+[Quality-gates]
+**You should verify the following quality gates before marking you job as done:**
   - [ ] Commit message has been written and complies with Conventional Commits format
   - [ ] CHANGELOG.md has been updated and complies with Keep a Changelog format
   - [ ] README.md has been updated (if there are major feature changes)
   - [ ] All detected version files have been updated consistently (Cargo.toml, package.json, pyproject.toml, *.lock, etc.)
-  - [ ] All output content has no sensitive information exposure (API keys, passwords, PII, etc.)
+  - [ ] All Products content has no sensitive information exposure (API keys, passwords, PII, etc.)
   - [ ] All validation items have passed (format check, content consistency, security check)
   - [ ] Git operations have been successfully executed (commit, branch, merge, push)
   - [ ] If on main branch, successfully created isolated branch and completed merge and push
   - [ ] Temporary files have been cleaned up (e.g., /tmp/staged_diff.txt)
 
 ## [Example-1]
-[Input]
+[Context]
 - Current branch: feature/user-auth
 - Staged changes: Added login form component, updated API endpoint
 - Version file: package.json with version "1.5.2"
@@ -194,10 +196,10 @@
 - CHANGELOG.md updated with new feature entry
 - Committed and pushed to feature/user-auth
 - No sensitive information detected
-- Re-evaluation tip: If issues or test results demonstrate that the change only corrects a defect in the existing login flow, recast it as `fix` despite the new components and highlight the repair in the output.
+- Re-evaluation tip: If issues or test results demonstrate that the change only corrects a defect in the existing login flow, recast it as `fix` despite the new components and highlight the repair in the Products.
 
 ## [Example-2]
-[Input]
+[Context]
 - Current branch: main
 - Staged changes: Fixed null pointer exception in data processor
 - Version file: Cargo.toml with version "1.2.3"
@@ -218,7 +220,7 @@
 - Re-evaluation tip: If the same set of changes also introduces a new data-processing mode and the bug fix is incidental, classify the submission as `feat` or split the commits so the fix and new capability are captured separately.
 
 ## [Example-3]
-[Input]
+[Context]
 - Current branch: main
 - Staged changes: Modified commands/sunnycore_commiter.md, added new validation steps
 - Version file: cursor-agents.lock with version "1.5.0"
@@ -230,7 +232,7 @@
     * Added requirement for AI to validate commit message length
     * Added new step for checking CHANGELOG format compliance
     * Changed AI behavior: Now performs additional validation → Functional change
-- Impact assessment: Changes alter AI execution flow and output quality
+- Impact assessment: Changes alter AI execution flow and Products quality
 - Conclusion: Prompt changes that modify AI behavior = feature addition
 
 [Decision]
@@ -252,7 +254,7 @@
 - Re-evaluation tip: If the project specification already mandated these validations but they were previously missing, reclassify as `fix`, and document how the expected behavior and accompanying tests were restored.
 
 ## [Example-4]
-[Input]
+[Context]
 - Current branch: main
 - Staged changes: Added new authentication middleware with breaking API changes
 - Version files detected: 
@@ -278,7 +280,7 @@
 - Pushed to remote, local branch deleted
 
 ## [Example-5]
-[Input]
+[Context]
 - Current branch: main
 - Staged changes: 
   * src/core/processor.rs: Fixed memory leak in data processing loop

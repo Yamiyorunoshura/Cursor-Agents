@@ -1,10 +1,10 @@
 **Goal**: Optimize prompts based on review reports while maintaining original intent, ensuring all modifications are traceable and require user confirmation.
 
-[Input]
+[Context]
   1. {root}/reports/{prompt_name}_review.md
   2. {root}/path/to/original_prompt.md or provide original prompt string directly
 
-[Output]
+[Products]
   1. Optimized prompt: Directly overwrite original file {root}/path/to/original_prompt.md
   2. Prompt optimization summary
 
@@ -21,7 +21,7 @@
   1. You need to ensure only necessary optimizations are performed, avoid generating content that adds >50 tokens without clear traceability to specific recommendations
   2. You need to ensure all optimizations are traceable to the Markdown review report, avoid optimizations outside the report
   3. You need to ensure only non-destructive optimizations are performed, while destructive optimizations need to wait for user confirmation
-  4. Length limitation: Optimizations should not significantly increase prompt length (increase <10%); prompt optimization summary <=300 tokens; strictly follow fixed output format
+  4. Length limitation: Optimizations should not significantly increase prompt length (increase <10%); prompt optimization summary <=300 tokens; strictly follow fixed Products format
   5. Traceability requirement: Each change must provide recommendation_id and line_range as evidence in optimization summary
   6. Non-destructive definition: Do not add/remove structural nodes (like adding blocks), do not change intent and constraints; only allow rhetorical adjustments, minor order changes (adjusting order of 2-3 adjacent items within the same block, no cross-block movement), and formatting. Destructive optimization examples: adding nodes, removing constraints, changing core intent, restructuring
   7. Style preservation: Maintain original prompt's language style and professional terminology; technical terms (like tool names, parameter names) must not be changed
@@ -52,6 +52,7 @@
     - You must complete all set reasoning steps
 
 [Steps]
+**You should work along to the following steps:**
   1. Analyze review report and categorize recommendations
     - Objective: Read and understand all optimization recommendations, evaluate their reasonableness, and categorize them into non-destructive and destructive types
     - Outcome: Clear categorization of all recommendations with critical analysis of any unreasonable suggestions, todo list created to track optimizations
@@ -68,7 +69,8 @@
     - Objective: Create comprehensive optimization summary with comparison examples and verify all DoD items are satisfied
     - Outcome: Optimization summary generated with evidence and traceability, all accepted todo items completed
 
-[DoD]
+[Quality-gates]
+**You should verify the following quality gates before marking you job as done:**
   - [ ] All modifications presented to user with before/after comparison
   - [ ] User has confirmed which modifications to accept
   - [ ] Optimized prompt saved with only accepted modifications
@@ -101,7 +103,7 @@
   ```
 
 ## [Example-1]
-[Input]
+[Context]
 - Review report: reports/task_automation_review.md (2 non-destructive recommendations, 0 destructive)
 - Original prompt: commands/task_automation.md
 
@@ -116,7 +118,7 @@
 - All todo items completed
 
 ## [Example-2]
-[Input]
+[Context]
 - Review report: reports/orchestrator_review.md (5 non-destructive, 2 destructive recommendations)
 - Original prompt: commands/orchestrator.md
 
@@ -132,7 +134,7 @@
 - 1 rejected recommendation noted in summary with reason
 
 ## [Example-3]
-[Input]
+[Context]
 - Review report: reports/code_reviewer_review.md (3 recommendations)
 - Original prompt: commands/code_reviewer.md (already well-structured)
 
