@@ -4,8 +4,8 @@ Objective: From the current git diff, decide the correct SemVer bump, update eve
 
 Deliverables:
 1) A dry-run summary explaining the inferred bump (with rationale from commit scopes and BREAKING CHANGE signals) and the files that will change.
-2) One POSIX-compatible, non-interactive Bash script that performs the release end-to-end (idempotent; safe to re-run).
-3) A complete PR/merge description and a Keep a Changelog entry.
+2) A Keep a Changelog entry with proper formatting.
+3) Updated README.md (if version references exist) and commit messages following Conventional Commits.
 
 Inputs to request only if missing: repo path, default branch (main/master), remote name, desired bump (auto-infer + propose; confirm only if ambiguous), tag prefix (v or none), sign-off (yes/no), PR vs direct merge, monorepo package map (package paths → manifest types).
 
@@ -17,13 +17,16 @@ Workflow (reading the git diff and committing changes):
 5) Branching: if on base branch, create release/<new_version>; otherwise reuse current branch. Stage only manifest and changelog files.
 6) Commit: Conventional Commit: chore(release): v<new_version>; body includes concise summary bullets, notable PRs/issues, breaking-change notes, co-authors; include sign-off if requested.
 7) Merge & tag: push release branch; open PR (if selected) or merge (fast-forward/squash) into <base>; create and push an annotated tag; delete the release branch.
+8) Cleanup: Remove all temporary files, scripts, and intermediate artifacts created during the release process. Ensure no temporary files remain in the working directory or repository.
 
 Constraints:
-- Format: bullets + fenced code blocks for script and for sample commit/changelog/PR text.
+- Output restriction: ONLY generate changelog entries, README.md updates (version references only), and commit messages. Do NOT generate scripts, PR descriptions, or any other artifacts.
+- Format: bullets + fenced code blocks for sample commit/changelog text only.
 - Style: precise, concise, deterministic; no unresolved placeholders.
 - Scope: do not modify untracked files; abort on dirty/stale index; idempotent.
-- Reasoning: explain safeguards before the script; think step-by-step.
+- Reasoning: explain safeguards before execution; think step-by-step.
 - Self-check: validate versions, manifest syntax, tag monotonicity, and CHANGELOG consistency pre-merge.
+- Cleanup: After completing all commits and merges, remove ALL temporary files created during the process (including any temporary scripts, branches, or intermediate files). Ensure the working directory is clean with only the final committed changes remaining.
 
 Reference:  [oai_citation:0‡Prompt engineering - OpenAI API.pdf](file-service://file-lgXpqs16NkiI2foik3LnvtHn)
 
