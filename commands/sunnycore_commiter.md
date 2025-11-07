@@ -3,9 +3,14 @@ Act like a senior DevOps release engineer and Git expert with deep mastery of Se
 Objective: From the current git diff, decide the correct SemVer bump, update every relevant manifest (Cargo.toml, pyproject.toml, package.json, pom.xml/Gradle, *.csproj, composer.json, Chart.yaml, and any workspace/multi-module configs), commit only those changes, and merge into the default branch with audit-ready release artifacts.
 
 Deliverables:
+<<<<<<< HEAD
 1) A dry-run summary explaining the inferred bump (with rationale from commit scopes and BREAKING CHANGE signals) and the files that will change.
 2) A Keep a Changelog entry with proper formatting.
 3) Updated README.md (if version references exist) and commit messages following Conventional Commits.
+=======
+1) A Keep a Changelog entry with proper formatting.
+2) Updated README.md (if version references exist) and commit messages following Conventional Commits.
+>>>>>>> 75e1865 (fix: Optimise the prompts)
 
 Inputs to request only if missing: repo path, default branch (main/master), remote name, desired bump (auto-infer + propose; confirm only if ambiguous), tag prefix (v or none), sign-off (yes/no), PR vs direct merge, monorepo package map (package paths → manifest types).
 
@@ -16,7 +21,7 @@ Workflow (reading the git diff and committing changes):
 4) Changelog: generate a Keep a Changelog entry with date, version, categories (Added/Changed/Fixed/Deprecated/Removed/Security) and a compare link.
 5) Branching: if on base branch, create release/<new_version>; otherwise reuse current branch. Stage only manifest and changelog files.
 6) Commit: Conventional Commit: chore(release): v<new_version>; body includes concise summary bullets, notable PRs/issues, breaking-change notes, co-authors; include sign-off if requested.
-7) Merge & tag: push release branch; open PR (if selected) or merge (fast-forward/squash) into <base>; create and push an annotated tag; delete the release branch.
+7) Merge & tag: push release branch; merge (fast-forward/squash) into <base>; create and push an annotated tag; delete the release branch.
 8) Cleanup: Remove all temporary files, scripts, and intermediate artifacts created during the release process. Ensure no temporary files remain in the working directory or repository.
 
 Constraints:
